@@ -1,0 +1,43 @@
+.deploy:
+  image: google/cloud-sdk:512.0.0-alpine
+  stage: deploy
+  before_script:
+    - export DEPLOY_EXECUTION_TS=$(date +%s)
+    - echo "export DEPLOY_EXECUTION_TS=${DEPLOY_EXECUTION_TS}" >> ${PIPELINE_VARS_FILE}
+    - echo ${DEPLOY_SERVICE_ACCOUNT} > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+  script:
+    - |
+      if [[ -z $(gcloud run services list --filter="metadata.name=${SERVICE_NAME}" --format="get(metadata.name)") ]]; then
+        gcloud run deploy ${SERVICE_NAME} \
+        --platform managed \
+        --region us-central1 \
+        --allow-unauthenticated \
+        --image us-docker.pkg.dev/cloudrun/container/hello \
+        --revision-suffix ${CI_COMMIT_SHORT_SHA}-initial
+      fi
+    - gcloud run deploy ${SERVICE_NAME}
+      --platform managed
+      --region us-central1
+      --allow-unauthenticated
+      --image ${IMAGE_URL}:${IMAGE_TAG}
+      --revision-suffix ${CI_COMMIT_SHORT_SHA}-${DEPLOY_EXECUTION_TS}
+      --no-traffic
+  artifacts:
+    paths:
+      - $PIPELINE_VARS_FILE
+
+deploy_dev:
+  extends: .deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: on_success
+  environment: dev
+
+deploy_main:
+  extends: .deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: on_success
+  environment: main

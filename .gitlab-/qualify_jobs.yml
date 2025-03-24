@@ -1,0 +1,9 @@
+static-analysis:
+  stage: qualify
+  image: python:3.12-alpine
+  before_script:
+    - apk add --no-cache git
+    - pip3 install pre-commit
+  script:
+    - echo "static analysis"
+    - echo "pre-commit run --all-files --verbose"

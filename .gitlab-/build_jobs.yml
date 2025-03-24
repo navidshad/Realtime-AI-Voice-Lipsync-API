@@ -1,0 +1,21 @@
+.build:
+  extends: .gitlab_job
+  stage: build
+  script:
+    - docker pull ${IMAGE_URL}:latest || true
+    - docker build --cache-from ${IMAGE_URL}:latest -t ${IMAGE_URL}:${IMAGE_TAG} -t ${IMAGE_URL}:latest .
+    - docker push ${IMAGE_URL} --all-tags
+
+build_dev:
+  extends: .build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: on_success
+  environment: dev
+
+build_main:
+  extends: .build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: on_success
+  environment: main

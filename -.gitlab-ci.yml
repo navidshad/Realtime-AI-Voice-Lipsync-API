@@ -1,0 +1,27 @@
+stages:
+  - qualify
+  - build
+  - deploy
+  - serve
+
+variables:
+  PIPELINE_VARS_FILE: ./pipeline_vars.env
+  IMAGE_URL: "us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/images/${CI_PROJECT_NAME}"
+  IMAGE_TAG: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+  SERVICE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
+
+.gitlab_job:
+  image: docker:27
+  services:
+    - docker:27-dind
+  before_script:
+    - echo ${DEPLOY_SERVICE_ACCOUNT} > ${HOME}/gcloud-service-key.json
+    - cat ${HOME}/gcloud-service-key.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+    - docker info
+    - rm ${HOME}/gcloud-service-key.json
+
+include:
+  - local: .gitlab/qualify_jobs.yml
+  - local: .gitlab/build_jobs.yml
+  - local: .gitlab/deploy_jobs.yml
+  - local: .gitlab/serve_jobs.yml

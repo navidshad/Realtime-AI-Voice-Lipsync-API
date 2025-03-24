@@ -1,0 +1,26 @@
+.serve:
+  image: google/cloud-sdk:512.0.0-alpine
+  stage: serve
+  before_script:
+    - source ${PIPELINE_VARS_FILE}
+    - echo ${DEPLOY_SERVICE_ACCOUNT} > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+  script:
+    - gcloud run services update-traffic ${SERVICE_NAME}
+      --region us-central1
+      --to-revisions ${SERVICE_NAME}-${CI_COMMIT_SHORT_SHA}-${DEPLOY_EXECUTION_TS}=100
+
+serve_dev:
+  extends: .serve
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: on_success
+  environment: dev
+
+serve_main:
+  extends: .serve
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  environment: main
