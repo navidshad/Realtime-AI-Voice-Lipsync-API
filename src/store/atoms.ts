@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { ConversationDialog, TokenUsage } from "../ai-logic/types";
 
 // Example of a basic atom
 export const countAtom = atom(0);
@@ -33,4 +34,17 @@ export const userPreferencesAtom = atom<UserPreferences>({
 export const isLoadingAtom = atom(false);
 
 // Error state atom example
-export const errorAtom = atom<string | null>(null); 
+export const errorAtom = atom<string | null>(null);
+
+// Live Session Atoms
+export const liveSessionIdAtom = atom<string | null>(null);
+export const liveSessionAtom = atom<any | null>(null);
+export const sessionStartedAtom = atom(false);
+export const conversationDialogsAtom = atom<ConversationDialog[]>([]);
+export const isMicrophoneMutedAtom = atom(false);
+export const tokenUsageAtom = atom<TokenUsage | null>(null);
+
+// Derived atoms for computed values
+export const isSessionActiveAtom = atom((get) => get(sessionStartedAtom));
+export const getConversationDialogsAtom = atom((get) => get(conversationDialogsAtom));
+export const getMicrophoneMutedAtom = atom((get) => get(isMicrophoneMutedAtom)); 
