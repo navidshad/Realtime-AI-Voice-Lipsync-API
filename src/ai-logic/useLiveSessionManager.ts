@@ -27,6 +27,7 @@ export function useLiveSessionManager() {
 	const microphoneStreamRef = useRef<MediaStream | null>(null);
 	const microphoneTrackRef = useRef<MediaStreamTrack | null>(null);
 	const onUpdateCallbackRef = useRef<((data: any) => void) | null>(null);
+	const onSessionCreatedCallbackRef = useRef<(() => void) | null>(null);
 	const sessionToolsRef = useRef<{ [key: string]: any } | null>(null);
 
 	const startLiveSession = async (session: LiveSession) => {
@@ -76,15 +77,17 @@ export function useLiveSessionManager() {
 		};
 		tools: { [key: string]: any };
 		onUpdate?: (data: any) => void;
+		onSessionCreated?: () => void;
 		audioRef: HTMLAudioElement | null;
 	}) => {
 		console.log('createLiveSession');
 
-		const { sessionDetails, tools, onUpdate, audioRef } = options;
+		const { sessionDetails, tools, onUpdate, onSessionCreated, audioRef } = options;
 
 		// Store the tools and callback
 		sessionToolsRef.current = tools;
 		onUpdateCallbackRef.current = onUpdate || null;
+		onSessionCreatedCallbackRef.current = onSessionCreated || null;
 		audioElementRef.current = audioRef;
 
 		try {
@@ -147,7 +150,11 @@ export function useLiveSessionManager() {
 
 		if (type === 'session.created') {
 			console.log('Session created', event_id);
+			if (onSessionCreatedCallbackRef.current) {
+				onSessionCreatedCallbackRef.current();
+			}
 		}
+
 		else if (type === 'response.audio_transcript.delta') {
 			const { delta, response_id } = eventData;
 			updateConversationDialogs(delta, response_id, 'ai');
@@ -249,7 +256,7 @@ export function useLiveSessionManager() {
 		dataChannelRef.current.send(JSON.stringify(continueResponse));
 	};
 
-	const triggerConversation = (message: string) => {
+	const triggerConversation = (instructions: string = '') => {
 		if (!dataChannelRef.current) {
 			throw new Error('No data channel available to send message');
 		}
@@ -258,12 +265,46 @@ export function useLiveSessionManager() {
 			type: 'response.create',
 			response: {
 				modalities: ['text', 'audio'],
-				instructions: message,
+				instructions: instructions,
 			},
 		};
 
+		// console.log('Sending system instructions:', instructions);
+
+
 		dataChannelRef.current.send(JSON.stringify(responseCreate));
 	};
+
+	const sendTextMessage = (message: string) => {
+		if (!dataChannelRef.current) {
+			throw new Error('No data channel available to send message');
+		}
+
+		const id = Date.now().toString();
+
+		const eventObject = {
+
+			"type": "conversation.item.create",
+			"item": {
+				"id": id,
+				"type": "message",
+				"role": "user",
+				"content": [
+					{
+						"type": "input_text",
+						"text": message,
+					}
+				]
+			}
+		}
+
+		// console.log('Sending user message:', message);
+
+		dataChannelRef.current.send(JSON.stringify(eventObject));
+		triggerConversation();
+
+		updateConversationDialogs(message, id, 'user');
+	}
 
 	const updateConversationDialogs = (content: string, id: string, speaker: 'user' | 'ai') => {
 		setConversationDialogs(prev => {
@@ -386,6 +427,7 @@ export function useLiveSessionManager() {
 		createLiveSession,
 		endLiveSession,
 		triggerConversation,
+		sendTextMessage,
 		clearConversationDialogs,
 		toggleMicrophone,
 	};

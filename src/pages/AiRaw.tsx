@@ -5,15 +5,18 @@ import { conversationDialogsAtom } from "../store/atoms";
 
 export const AiRaw: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
+
   const {
     createLiveSession,
     endLiveSession,
     triggerConversation,
+    sendTextMessage,
     clearConversationDialogs,
     toggleMicrophone,
     isMicrophoneMuted,
     sessionStarted,
   } = useLiveSessionManager();
+
   const [conversationDialogs] = useAtom(conversationDialogsAtom);
   const [showChatbox, setShowChatbox] = useState(false);
   const [message, setMessage] = useState("");
@@ -31,6 +34,11 @@ export const AiRaw: React.FC = () => {
         },
         tools: {}, // Add your tools here
         audioRef: audioRef.current,
+        onSessionCreated() {
+          triggerConversation(
+            "User is here, greeting and start the conversation"
+          );
+        },
       });
     }
     return () => {
@@ -46,7 +54,7 @@ export const AiRaw: React.FC = () => {
 
   const handleSendMessage = () => {
     if (message.trim() && sessionStarted) {
-      triggerConversation(message);
+      sendTextMessage(message);
       setMessage("");
     }
   };
@@ -152,7 +160,7 @@ export const AiRaw: React.FC = () => {
             gap: "8px",
           }}
         >
-          {showChatbox ? "Hide Chat" : "Show Chat"}
+          {showChatbox ? "Hide History" : "Show History"}
         </button>
       </div>
 
