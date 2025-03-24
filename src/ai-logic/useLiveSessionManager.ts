@@ -1,4 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
+import { useRef } from 'react';
 import {
 	liveSessionIdAtom,
 	liveSessionAtom,
@@ -8,7 +9,7 @@ import {
 	tokenUsageAtom,
 } from '../store/atoms';
 import { requestLiveSessionEphemeralToken } from './utils';
-import { TokenUsage } from './types';
+import { TokenUsage, LiveSession, EphemeralToken } from './types';
 
 export function useLiveSessionManager() {
 	// State atoms
@@ -19,111 +20,35 @@ export function useLiveSessionManager() {
 	const [isMicrophoneMuted, setIsMicrophoneMuted] = useAtom(isMicrophoneMutedAtom);
 	const [tokenUsage, setTokenUsage] = useAtom(tokenUsageAtom);
 
-	// RTCPeerConnection state
-	let peerConnection: RTCPeerConnection | null = null;
-	let dataChannel: RTCDataChannel | null = null;
-	let audioElement: HTMLAudioElement | null = null;
-	let microphoneStream: MediaStream | null = null;
-	let microphoneTrack: MediaStreamTrack | null = null;
+	// Refs for persistent values
+	const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+	const dataChannelRef = useRef<RTCDataChannel | null>(null);
+	const audioElementRef = useRef<HTMLAudioElement | null>(null);
+	const microphoneStreamRef = useRef<MediaStream | null>(null);
+	const microphoneTrackRef = useRef<MediaStreamTrack | null>(null);
+	const onUpdateCallbackRef = useRef<((data: any) => void) | null>(null);
+	const sessionToolsRef = useRef<{ [key: string]: any } | null>(null);
 
-	// Custom callback function that will be called on session events
-	let onUpdateCallback: ((data: any) => void) | null = null;
-	let sessionTools: { [key: string]: any } | null = null;
-
-	const createLiveSession = async (options: {
-		sessionDetails: {
-			instructions: string;
-			voice?: string;
-			turnDetectionSilenceDuration?: number;
-		};
-		tools: { [key: string]: any };
-		onUpdate?: (data: any) => void;
-		audioRef: HTMLAudioElement | null;
-	}) => {
-		const { sessionDetails, tools, onUpdate, audioRef } = options;
-
-		// Store the tools and callback
-		sessionTools = tools;
-		onUpdateCallback = onUpdate || null;
-		audioElement = audioRef;
-
-		try {
-			// Create the session
-			const session = await requestLiveSessionEphemeralToken({
-				voice: sessionDetails.voice || 'alloy',
-				instructions: sessionDetails.instructions,
-				tools: Object.values(tools).map((t) => t.definition),
-				tool_choice: 'auto',
-				turn_detection: {
-					type: 'server_vad',
-					silence_duration_ms: sessionDetails.turnDetectionSilenceDuration || 1000,
-				},
-
-			});
-
-			setLiveSession(session);
-			await createLiveSessionRecordOnServer();
-
-			// Set up RTP and start the session
-			await setupRTP();
-			await startLiveSession();
-
-			// mute the microphone
-			toggleMicrophone(false);
-
-			return { success: true, session };
-		} catch (error) {
-			console.error('Failed to create live session:', error);
-			throw error;
-		}
-	};
-
-	const setupRTP = async () => {
-		if (!audioElement) {
-			throw new Error('Audio element not provided');
-		}
-
-		// Create a peer connection
-		peerConnection = new RTCPeerConnection();
-
-		// Set up to play remote audio from the model
-		audioElement.autoplay = true;
-		peerConnection.ontrack = (e) => {
-			if (audioElement) audioElement.srcObject = e.streams[0];
-		};
-
-		// Add local audio track for microphone input in the browser
-		microphoneStream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
-		});
-		microphoneTrack = microphoneStream.getTracks()[0];
-		peerConnection.addTrack(microphoneTrack);
-	};
-
-	const startLiveSession = async () => {
-		if (liveSession === null) {
-			throw new Error('No active session to start');
-		}
-
-		if (peerConnection === null) {
+	const startLiveSession = async (session: LiveSession) => {
+		if (peerConnectionRef.current === null) {
 			throw new Error('Peer connection not set up');
 		}
 
 		// Set up data channel for sending and receiving events
-		dataChannel = peerConnection.createDataChannel('oai-events');
+		dataChannelRef.current = peerConnectionRef.current.createDataChannel('oai-events');
 
-		dataChannel.addEventListener('message', (e) => {
+		dataChannelRef.current.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data);
 			onSessionEvent(data);
 		});
 
 		// Start the session using the Session Description Protocol (SDP)
-		const offer = await peerConnection.createOffer();
-		await peerConnection.setLocalDescription(offer);
+		const offer = await peerConnectionRef.current.createOffer();
+		await peerConnectionRef.current.setLocalDescription(offer);
 
 		const baseUrl = 'https://api.openai.com/v1/realtime';
-		const model = liveSession.model;
-		const EPHEMERAL_KEY = liveSession.client_secret.value;
+		const model = session.model;
+		const EPHEMERAL_KEY = session.client_secret.value;
 
 		const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
 			method: 'POST',
@@ -139,13 +64,83 @@ export function useLiveSessionManager() {
 			sdp: await sdpResponse.text(),
 		};
 
-		await peerConnection.setRemoteDescription(answer as any);
+		await peerConnectionRef.current.setRemoteDescription(answer as any);
 		setSessionStarted(true);
 	};
 
+	const createLiveSession = async (options: {
+		sessionDetails: {
+			instructions: string;
+			voice?: string;
+			turnDetectionSilenceDuration?: number;
+		};
+		tools: { [key: string]: any };
+		onUpdate?: (data: any) => void;
+		audioRef: HTMLAudioElement | null;
+	}) => {
+		console.log('createLiveSession');
+
+		const { sessionDetails, tools, onUpdate, audioRef } = options;
+
+		// Store the tools and callback
+		sessionToolsRef.current = tools;
+		onUpdateCallbackRef.current = onUpdate || null;
+		audioElementRef.current = audioRef;
+
+		try {
+			// Create the session
+			const session = await requestLiveSessionEphemeralToken({
+				voice: sessionDetails.voice || 'alloy',
+				instructions: sessionDetails.instructions,
+				tools: Object.values(tools).map((t) => t.definition),
+				tool_choice: 'auto',
+				turn_detection: {
+					type: 'server_vad',
+					silence_duration_ms: sessionDetails.turnDetectionSilenceDuration || 1000,
+				},
+			});
+
+			// Set the live session state
+			setLiveSession(session);
+
+			// Create record and continue with setup
+			await createLiveSessionRecordOnServer();
+			await setupRTP();
+			await startLiveSession(session);
+			toggleMicrophone(false);
+
+			return { success: true, session };
+		} catch (error) {
+			console.error('Failed to create live session:', error);
+			throw error;
+		}
+	};
+
+	const setupRTP = async () => {
+		if (!audioElementRef.current) {
+			throw new Error('Audio element not provided');
+		}
+
+		// Create a peer connection
+		peerConnectionRef.current = new RTCPeerConnection();
+
+		// Set up to play remote audio from the model
+		audioElementRef.current.autoplay = true;
+		peerConnectionRef.current.ontrack = (e) => {
+			if (audioElementRef.current) audioElementRef.current.srcObject = e.streams[0];
+		};
+
+		// Add local audio track for microphone input in the browser
+		microphoneStreamRef.current = await navigator.mediaDevices.getUserMedia({
+			audio: true,
+		});
+		microphoneTrackRef.current = microphoneStreamRef.current.getTracks()[0];
+		peerConnectionRef.current.addTrack(microphoneTrackRef.current);
+	};
+
 	const onSessionEvent = (eventData: any) => {
-		if (onUpdateCallback) {
-			onUpdateCallback(eventData);
+		if (onUpdateCallbackRef.current) {
+			onUpdateCallbackRef.current(eventData);
 		}
 
 		const { type, event_id } = eventData;
@@ -185,22 +180,22 @@ export function useLiveSessionManager() {
 	};
 
 	const endLiveSession = () => {
-		if (peerConnection === null) {
+		if (peerConnectionRef.current === null) {
 			console.warn('No active peer connection to close');
 			return { success: false, message: 'No active session' };
 		}
 
-		peerConnection.close();
-		peerConnection = null;
-		dataChannel = null;
+		peerConnectionRef.current.close();
+		peerConnectionRef.current = null;
+		dataChannelRef.current = null;
 
-		if (microphoneTrack) {
-			microphoneTrack.stop();
-			microphoneTrack = null;
+		if (microphoneTrackRef.current) {
+			microphoneTrackRef.current.stop();
+			microphoneTrackRef.current = null;
 		}
-		if (microphoneStream) {
-			microphoneStream.getTracks().forEach(track => track.stop());
-			microphoneStream = null;
+		if (microphoneStreamRef.current) {
+			microphoneStreamRef.current.getTracks().forEach(track => track.stop());
+			microphoneStreamRef.current = null;
 		}
 
 		setSessionStarted(false);
@@ -211,7 +206,7 @@ export function useLiveSessionManager() {
 	};
 
 	const onFunctionCall = (eventData: any) => {
-		if (!sessionTools || !dataChannel) return;
+		if (!sessionToolsRef.current || !dataChannelRef.current) return;
 
 		const [output01] = eventData.response.output;
 		console.log('Function call', output01);
@@ -219,7 +214,7 @@ export function useLiveSessionManager() {
 		const functionName = output01.name as string;
 		const args = JSON.parse(output01.arguments);
 
-		const fn = sessionTools[functionName];
+		const fn = sessionToolsRef.current[functionName];
 		let fnResponse: { success: boolean;[key: string]: any } = { success: false };
 
 		if (!fn) {
@@ -243,19 +238,19 @@ export function useLiveSessionManager() {
 			},
 		};
 
-		if (!dataChannel) return;
+		if (!dataChannelRef.current) return;
 
-		dataChannel.send(JSON.stringify(response));
+		dataChannelRef.current.send(JSON.stringify(response));
 
 		const continueResponse = {
 			type: 'response.create',
 		};
 
-		dataChannel.send(JSON.stringify(continueResponse));
+		dataChannelRef.current.send(JSON.stringify(continueResponse));
 	};
 
 	const triggerConversation = (message: string) => {
-		if (!dataChannel) {
+		if (!dataChannelRef.current) {
 			throw new Error('No data channel available to send message');
 		}
 
@@ -267,7 +262,7 @@ export function useLiveSessionManager() {
 			},
 		};
 
-		dataChannel.send(JSON.stringify(responseCreate));
+		dataChannelRef.current.send(JSON.stringify(responseCreate));
 	};
 
 	const updateConversationDialogs = (content: string, id: string, speaker: 'user' | 'ai') => {
@@ -289,15 +284,15 @@ export function useLiveSessionManager() {
 
 	const toggleMicrophone = (active?: boolean) => {
 		if (active !== undefined) {
-			if (microphoneTrack) {
+			if (microphoneTrackRef.current) {
 				setIsMicrophoneMuted(true);
-				microphoneTrack.enabled = false;
+				microphoneTrackRef.current.enabled = false;
 			}
 		}
-		else if (microphoneTrack) {
+		else if (microphoneTrackRef.current) {
 			setIsMicrophoneMuted(prev => {
 				const newState = !prev;
-				microphoneTrack!.enabled = !newState;
+				microphoneTrackRef.current!.enabled = !newState;
 				return newState;
 			});
 		}
@@ -362,9 +357,9 @@ export function useLiveSessionManager() {
 	};
 
 	const updateLiveSessionRecordOnServer = async () => {
-		if (!liveSessionId) {
-			throw new Error('No live session record id found');
-		}
+		// if (!liveSessionId) {
+		// 	throw new Error('No live session record id found');
+		// }
 
 		// const totalDialogs = conversationDialogs.length;
 		// const lastDialog = totalDialogs > 0 ? conversationDialogs[totalDialogs - 1] : null;

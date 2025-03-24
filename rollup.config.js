@@ -1,5 +1,7 @@
 import serve from 'rollup-plugin-serve';
-import { terser } from 'rollup-plugin-terser'; // Optional: for minification
+import {
+    terser
+} from 'rollup-plugin-terser'; // Optional: for minification
 import resolve from '@rollup/plugin-node-resolve'; // Resolve node modules
 import commonjs from '@rollup/plugin-commonjs'; // Convert CommonJS to ES6
 import json from '@rollup/plugin-json'; // Import the JSON plugin
@@ -14,11 +16,11 @@ import tailwindcss from '@tailwindcss/postcss';
 // Load environment variables from .env file
 dotenv.config();
 
-if(!process.env.NODE_ENV){
+if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'development'; // Default to development if not set
 }
 
-if(!process.env.NODE_MODE){
+if (!process.env.NODE_MODE) {
     process.env.NODE_MODE = 'dev'; // Default to dev if not set
 }
 
@@ -30,8 +32,7 @@ const isDevMode = !isBuildMode;
 
 process.env.ENV_EXAMPLE = isProduction ? process.env.ENV_EXAMPLE_PRODUCTION : process.env.ENV_EXAMPLE_STAGING;
 
-export default [
-    {
+export default [{
         input: 'src/_index.tsx',
         output: {
             file: `dist/bundle${isStaging ? '.staging' : ''}.js`,
@@ -41,12 +42,15 @@ export default [
         },
         external: ['dotenv'],
         plugins: [
-            del({ targets: 'dist/*' }),
+            del({
+                targets: 'dist/*'
+            }),
             replace({
                 preventAssignment: true,
                 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
                 'process.env.NODE_MODE': JSON.stringify(process.env.NODE_MODE),
-                'process.env.GET_SESSION_DATA_URL': JSON.stringify(process.env.GET_SESSION_DATA_URL)
+                'process.env.GET_SESSION_DATA_URL': JSON.stringify(process.env.GET_SESSION_DATA_URL),
+                'process.env.OPENAI_API_KEY': JSON.stringify(process.env.OPENAI_API_KEY),
             }),
             dotenvPlugin(),
             json(),

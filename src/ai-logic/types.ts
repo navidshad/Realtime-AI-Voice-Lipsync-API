@@ -22,3 +22,13 @@ export interface TokenUsage {
 		audio_tokens: number;
 	};
 }
+
+export interface EphemeralToken {
+	model: string;
+	client_secret: {
+		value: string;
+	};
+	expires_in: number;
+}
+
+export type LiveSession = EphemeralToken;
