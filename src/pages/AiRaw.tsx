@@ -1,132 +1,285 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
+import { useAtom } from "jotai";
+import { conversationDialogsAtom } from "../store/atoms";
 
 export const AiRaw: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const initializedRef = useRef(false);
-  const [message, setMessage] = useState("");
   const {
-    liveSession,
-    sessionStarted,
-    conversationDialogs,
-    isMicrophoneMuted,
     createLiveSession,
     endLiveSession,
     triggerConversation,
     clearConversationDialogs,
     toggleMicrophone,
+    isMicrophoneMuted,
+    sessionStarted,
   } = useLiveSessionManager();
+  const [conversationDialogs] = useAtom(conversationDialogsAtom);
+  const [showChatbox, setShowChatbox] = useState(false);
+  const [message, setMessage] = useState("");
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    // Initialize the live session when the component mounts
-    const initSession = async () => {
-      if (initializedRef.current) return;
-
-      // Only set initialized after successful session creation
+    if (!initializedRef.current) {
       initializedRef.current = true;
-
-      try {
-        await createLiveSession({
-          sessionDetails: {
-            instructions:
-              "You are a helpful AI assistant. Help the user with their questions.",
-            voice: "alloy",
-            turnDetectionSilenceDuration: 1000,
-          },
-          tools: {}, // Add your tools here
-          audioRef: audioRef.current,
-        });
-      } catch (error) {
-        console.error("Failed to initialize session:", error);
-      }
-    };
-
-    initSession();
-
-    // Cleanup when component unmounts
+      createLiveSession({
+        sessionDetails: {
+          instructions:
+            "You are a helpful AI assistant. Help the user with their questions.",
+          voice: "alloy",
+          turnDetectionSilenceDuration: 1000,
+        },
+        tools: {}, // Add your tools here
+        audioRef: audioRef.current,
+      });
+    }
     return () => {
-      // Only end the session if we've actually initialized it
       if (initializedRef.current) {
         endLiveSession();
       }
     };
   }, []);
 
+  const handleChatboxToggle = () => {
+    setShowChatbox((prev) => !prev);
+  };
+
   const handleSendMessage = () => {
-    if (message.trim()) {
+    if (message.trim() && sessionStarted) {
       triggerConversation(message);
       setMessage("");
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  // Get the last AI dialog
+  const lastAiDialog = conversationDialogs
+    .slice()
+    .reverse()
+    .find((dialog) => dialog.speaker === "ai");
+
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">AI Raw Chat</h1>
-
-        {/* Audio element for AI responses */}
-        <audio ref={audioRef} className="hidden" />
-
-        {/* Conversation history */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-4 h-[60vh] overflow-y-auto">
-          {conversationDialogs.map((dialog, index) => (
-            <div
-              key={dialog.id}
-              className={`mb-4 p-3 rounded-lg ${
-                dialog.speaker === "ai"
-                  ? "bg-blue-100 ml-4"
-                  : "bg-gray-100 mr-4"
-              }`}
-            >
-              <p className="text-sm font-semibold mb-1">
-                {dialog.speaker === "ai" ? "AI" : "You"}
-              </p>
-              <p>{dialog.content}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => toggleMicrophone()}
-            className={`px-4 py-2 rounded-lg ${
-              isMicrophoneMuted
-                ? "bg-red-500 text-white"
-                : "bg-green-500 text-white"
-            }`}
+    <div
+      style={{
+        position: "relative",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#f5f5f5",
+      }}
+    >
+      {/* Main Content Area */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+          width: showChatbox ? "calc(100% - 350px)" : "100%",
+          transition: "width 0.3s ease",
+        }}
+      >
+        {/* Presentation Section */}
+        {lastAiDialog && (
+          <div
+            style={{
+              padding: "20px",
+              borderRadius: "12px",
+              backgroundColor: "#fff",
+              maxWidth: "80%",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              textAlign: "center",
+              fontSize: "18px",
+              lineHeight: "1.6",
+            }}
           >
-            {isMicrophoneMuted ? "Unmute" : "Mute"} Microphone
-          </button>
-
-          <button
-            onClick={clearConversationDialogs}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg"
-          >
-            Clear Chat
-          </button>
-        </div>
-
-        {/* Message input */}
-        <div className="flex gap-2 mt-4">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Type your message..."
-            className="flex-1 p-2 border rounded-lg"
-            disabled={!sessionStarted}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!sessionStarted || !message.trim()}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-          >
-            Send
-          </button>
-        </div>
+            {lastAiDialog.content}
+          </div>
+        )}
       </div>
+
+      {/* Action Buttons Section */}
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#fff",
+          borderTop: "1px solid #e0e0e0",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "center",
+          width: showChatbox ? "calc(100% - 350px)" : "100%",
+          transition: "width 0.3s ease",
+        }}
+      >
+        <button
+          onClick={() => toggleMicrophone()}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "20px",
+            backgroundColor: isMicrophoneMuted ? "#ff4444" : "#4CAF50",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          {isMicrophoneMuted ? "Unmute" : "Mute"} Mic
+        </button>
+
+        <button
+          onClick={handleChatboxToggle}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "20px",
+            backgroundColor: "#2196F3",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          {showChatbox ? "Hide Chat" : "Show Chat"}
+        </button>
+      </div>
+
+      {/* Chatbox */}
+      {showChatbox && (
+        <div
+          style={{
+            position: "fixed",
+            right: 0,
+            top: 0,
+            width: "350px",
+            height: "100vh",
+            backgroundColor: "#fff",
+            borderLeft: "1px solid #e0e0e0",
+            display: "flex",
+            flexDirection: "column",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #e0e0e0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h3 style={{ margin: 0 }}>Chat History</h3>
+            <button
+              onClick={handleChatboxToggle}
+              style={{
+                background: "none",
+                border: "none",
+                fontSize: "20px",
+                cursor: "pointer",
+                padding: "5px",
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
+            {conversationDialogs.map((dialog) => (
+              <div
+                key={dialog.id}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  backgroundColor:
+                    dialog.speaker === "user" ? "#e3f2fd" : "#f5f5f5",
+                  maxWidth: "80%",
+                  alignSelf:
+                    dialog.speaker === "user" ? "flex-end" : "flex-start",
+                }}
+              >
+                {dialog.content}
+              </div>
+            ))}
+          </div>
+          {/* Chat Input Section */}
+          <div
+            style={{
+              padding: "20px",
+              borderTop: "1px solid #e0e0e0",
+              backgroundColor: "#fff",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                alignItems: "flex-end",
+              }}
+            >
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                disabled={!sessionStarted}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #e0e0e0",
+                  resize: "none",
+                  minHeight: "40px",
+                  maxHeight: "120px",
+                  fontFamily: "inherit",
+                  fontSize: "14px",
+                }}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!sessionStarted || !message.trim()}
+                style={{
+                  padding: "10px 20px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor:
+                    sessionStarted && message.trim() ? "#2196F3" : "#ccc",
+                  color: "white",
+                  cursor:
+                    sessionStarted && message.trim()
+                      ? "pointer"
+                      : "not-allowed",
+                  fontSize: "14px",
+                }}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <audio ref={audioRef} />
     </div>
   );
 };
