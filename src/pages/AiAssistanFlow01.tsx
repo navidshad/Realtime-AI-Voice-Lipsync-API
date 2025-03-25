@@ -19,12 +19,16 @@ export const AiAssistantFlow01: React.FC = () => {
       {
         label: "Step 1",
         instructions:
-          "Help the user to select a city from all the cities in the world.",
+          "Help the user to select a city from all the cities in the world. dont talk about detail in this step, just ask the user to select a city.",
         tools: {},
       },
       {
         label: "Step 2",
-        instructions: "now let's talk about the selected city",
+        instructions: `
+        Goal: Now let's talk about the selected city.
+        Instructions: Talk about the selected city in detail.
+        Finish signal: if user shows he or she got the enough information about the city.
+        `,
         tools: {},
       },
       {
