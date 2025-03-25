@@ -1,11 +1,16 @@
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {
+    fileURLToPath
+} from 'url';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import fs from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
+import lipsyncRouter from './lipsinc.js';
+
+const __filename = fileURLToPath(
+    import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables
@@ -38,6 +43,7 @@ apiRouter.get('/get-token', (req, res) => {
 
 // Mount the API router with /api prefix
 app.use('/api', apiRouter);
+app.use('/lipsync', lipsyncRouter);
 
 // Debug route to check file system
 app.get('/debug', (req, res) => {
@@ -57,7 +63,7 @@ app.get('/debug', (req, res) => {
 if (isProduction) {
     const distPath = path.join(__dirname, 'dist');
     const publicPath = path.join(__dirname, 'public');
-    
+
     console.log('Production mode - static file paths:', {
         distPath,
         publicPath,
@@ -70,22 +76,22 @@ if (isProduction) {
             public: fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : []
         }
     });
-    
+
     // Serve static files from dist first (since it contains the built files)
     app.use(express.static(distPath));
     app.use(express.static(publicPath));
-    
+
     // Catch-all route to serve index.html in production
     app.get('*', (req, res) => {
         const indexPath = path.join(publicPath, 'index.html');
         console.log('Request for:', req.path);
         console.log('Trying to serve index.html from:', indexPath);
         console.log('Index exists:', fs.existsSync(indexPath));
-        
+
         if (fs.existsSync(indexPath)) {
             res.sendFile(indexPath);
         } else {
-            res.status(404).send('Index file not found. Available files: ' + 
+            res.status(404).send('Index file not found. Available files: ' +
                 JSON.stringify({
                     dist: fs.existsSync(distPath) ? fs.readdirSync(distPath) : [],
                     public: fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : []
@@ -104,4 +110,4 @@ app.listen(SERVER_PORT, () => {
             files: fs.readdirSync(__dirname)
         });
     }
-}); 
+});
