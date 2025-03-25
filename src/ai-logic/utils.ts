@@ -2,8 +2,9 @@
 import { EphemeralToken } from "./types";
 
 export async function requestLiveSessionEphemeralToken(additionalSetup: {
-	voice: string;
+	voice?: string;
 	instructions: string;
+	modalities?: string[];
 	tools: object;
 	tool_choice: string;
 	turn_detection: {

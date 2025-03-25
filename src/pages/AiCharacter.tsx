@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { conversationDialogsAtom } from "../store/atoms";
 import TalkingHeadAvatar from "../character/TalkingHeadAvatar";
 
-export const AiRaw: React.FC = () => {
+export const AiCharacter: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const {
@@ -30,7 +30,7 @@ export const AiRaw: React.FC = () => {
         sessionDetails: {
           instructions:
             "You are a helpful AI assistant. Help the user with their questions.",
-          voice: "alloy",
+          onlyText: true,
           turnDetectionSilenceDuration: 1000,
         },
         tools: {}, // Add your tools here
@@ -40,6 +40,7 @@ export const AiRaw: React.FC = () => {
             "User is here, greeting and start the conversation"
           );
         },
+        onUpdate: onUpdate,
       });
     }
     return () => {
@@ -66,6 +67,19 @@ export const AiRaw: React.FC = () => {
       handleSendMessage();
     }
   };
+
+  const audioTempChuks: Record<string, any> = {};
+  function onUpdate(eventData: any) {
+    const { type, event_id, response_id, delta } = eventData;
+    // console.log(type, "delta:", delta);
+
+    if (type === "response.audio.delta") {
+      audioTempChuks[response_id] += delta;
+    } else if (type === "response.audio.completed") {
+      const audioChunks = audioTempChuks[response_id];
+      console.log(audioChunks);
+    }
+  }
 
   // Get the last AI dialog
   const lastAiDialog = conversationDialogs
@@ -287,6 +301,8 @@ export const AiRaw: React.FC = () => {
           </div>
         </div>
       )}
+
+      <TalkingHeadAvatar characterUrl="/models/634c5abfd5dcded8a45e70e0.glb" />
 
       <audio ref={audioRef} />
     </div>

@@ -29,6 +29,8 @@ export function useLiveSessionManager() {
 	const onUpdateCallbackRef = useRef<((data: any) => void) | null>(null);
 	const onSessionCreatedCallbackRef = useRef<((eventData: any) => void) | null>(null);
 	const sessionToolsRef = useRef<{ [key: string]: any } | null>(null);
+	const sessionModalitiesRef = useRef<string[] | null>(null);
+	const onlyTextRef = useRef<boolean | null>(null);
 
 	/* 
 	 * Creating and configuring a live session 
@@ -37,8 +39,9 @@ export function useLiveSessionManager() {
 	const createLiveSession = async (options: {
 		sessionDetails: {
 			instructions: string;
-			voice?: string;
 			turnDetectionSilenceDuration?: number;
+			voice?: string;
+			onlyText?: boolean;
 		};
 		tools: AiTools;
 		onUpdate?: (data: any) => void;
@@ -54,11 +57,13 @@ export function useLiveSessionManager() {
 		onUpdateCallbackRef.current = onUpdate || null;
 		onSessionCreatedCallbackRef.current = onSessionCreated || null;
 		audioElementRef.current = audioRef;
+		sessionModalitiesRef.current = ['text', 'audio'];
+		onlyTextRef.current = sessionDetails.onlyText || false;
 
 		try {
 			// Create the session
 			const session = await requestLiveSessionEphemeralToken({
-				voice: sessionDetails.voice || 'alloy',
+				voice: sessionDetails.voice,
 				instructions: sessionDetails.instructions,
 				tools: Object.values(tools).map((t) => t.definition),
 				tool_choice: 'auto',
@@ -66,6 +71,7 @@ export function useLiveSessionManager() {
 					type: 'server_vad',
 					silence_duration_ms: sessionDetails.turnDetectionSilenceDuration || 1000,
 				},
+				modalities: sessionModalitiesRef.current,
 			});
 
 			// Set the live session state
@@ -124,18 +130,22 @@ export function useLiveSessionManager() {
 	};
 
 	const setupRTP = async () => {
-		if (!audioElementRef.current) {
-			throw new Error('Audio element not provided');
-		}
+
 
 		// Create a peer connection
 		peerConnectionRef.current = new RTCPeerConnection();
 
 		// Set up to play remote audio from the model
-		audioElementRef.current.autoplay = true;
-		peerConnectionRef.current.ontrack = (e) => {
-			if (audioElementRef.current) audioElementRef.current.srcObject = e.streams[0];
-		};
+		if (!onlyTextRef.current) {
+			if (!audioElementRef.current) {
+				throw new Error('Audio element not provided');
+			}
+
+			audioElementRef.current.autoplay = true;
+			peerConnectionRef.current.ontrack = (e) => {
+				if (audioElementRef.current) audioElementRef.current.srcObject = e.streams[0];
+			};
+		}
 
 		// Add local audio track for microphone input in the browser
 		microphoneStreamRef.current = await navigator.mediaDevices.getUserMedia({
@@ -153,7 +163,7 @@ export function useLiveSessionManager() {
 		const { type, event_id } = eventData;
 
 		if (type === 'session.created') {
-			console.log('Session created', event_id);
+			console.log('Session created', eventData.session);
 			if (onSessionCreatedCallbackRef.current) {
 				onSessionCreatedCallbackRef.current(eventData);
 			}
@@ -276,12 +286,12 @@ export function useLiveSessionManager() {
 		const responseCreate = {
 			type: 'response.create',
 			response: {
-				modalities: ['text', 'audio'],
+				modalities: sessionModalitiesRef.current,
 				instructions: instructions,
 			},
 		};
 
-		// console.log('Sending system instructions:', instructions);
+		console.log('Sending system instructions:', responseCreate);
 
 
 		dataChannelRef.current.send(JSON.stringify(responseCreate));

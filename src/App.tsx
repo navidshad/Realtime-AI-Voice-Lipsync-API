@@ -8,6 +8,7 @@ import { CounterExample } from "./components/examples/CounterExample";
 import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
+import { AiCharacter } from "./pages/AiCharacter";
 import { AiAssistantFlow01 } from "./pages/AiAssistanFlow01";
 
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
               path="/ai-assistant-flow01"
               element={<AiAssistantFlow01 />}
             />
+            <Route path="/ai-character" element={<AiCharacter />} />
             <Route
               path="/"
               element={
@@ -45,6 +47,12 @@ export function App() {
                           className=" hover:text-gray-700"
                         >
                           AI Assistant
+                        </Link>
+                        <Link
+                          to="/ai-character"
+                          className=" hover:text-gray-700"
+                        >
+                          AI Character
                         </Link>
                       </div>
                     </nav>
