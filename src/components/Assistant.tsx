@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {twMerge} from "tailwind-merge";
 import ChatModule from './modules/chat';
 import ApikaModule from './modules/apika';
+import { conversationDialogsAtom } from '../store/atoms';
+import { useAtom } from 'jotai';
+import { useApika } from '../hooks/useApika';
 
 export const Assistant = ({className = ''}) => {
+
+  const {
+    sendTextMessage,
+    clearConversationDialogs,
+    toggleMicrophone,
+    isMicrophoneMuted,
+  } = useApika();
+
+  const [showChatHistory, setShowChatHistory] = useState(true);
+
   return (
     <div
       id="apika-assistant"
@@ -16,7 +29,7 @@ export const Assistant = ({className = ''}) => {
         <div className="flex-1 h-full">
           <ApikaModule />
         </div>
-          <ChatModule />
+         {showChatHistory && <ChatModule sendTextMessage={sendTextMessage} />}
       </div>
     </div>
   );

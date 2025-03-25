@@ -1,4 +1,7 @@
+import { useAtom } from "jotai";
 import React, { useState } from "react";
+import { conversationDialogsAtom } from "../../../store/atoms";
+import { ConversationDialog } from "../../../ai-logic/types";
 
 interface ApikaCard {
     type: "card";
@@ -12,38 +15,20 @@ interface ApikaMessage {
 }
 
 const ApikaModule: React.FC = () => {
-  const [currentMessage, setCurrentMessage] = useState<ApikaMessage>({
-    message: "Hi! I'm APIKA, your course selection assistant.",
-    content: [{
-      type: "card",
-      title: "Course Selection Assistant",
-      description: "I can help you find the perfect course based on your interests and goals. Would you like to start exploring courses together?"
-    }, {
-        type: "card",
-        title: "Course Selection Assistant",
-        description: "I can help you find the perfect course based on your interests and goals. Would you like to start exploring courses together?"
-      }, {
-        type: "card",
-        title: "Course Selection Assistant",
-        description: "I can help you find the perfect course based on your interests and goals. Would you like to start exploring courses together?"
-      } ,{
-        type: "card",
-        title: "Course Selection Assistant",
-        description: "I can help you find the perfect course based on your interests and goals. Would you like to start exploring courses together?"
-      }]
-  });
+    const [conversationDialogs] = useAtom(conversationDialogsAtom);
+    const apikaMessage = conversationDialogs
+    .slice()
+    .reverse()
+    .find((dialog) => dialog.speaker === "ai");
 
-  // Method to set new message from AGI
-  const setMessage = (message: ApikaMessage) => {
-    setCurrentMessage(message);
-  };
-
-  const renderMessage = (message: ApikaMessage) => {
+  const renderMessage = (message: ConversationDialog) => {
     return (
       <div className="w-full space-y-4">
         <div className="p-6">
-          <p className="text-lg text-gray-800 text-center">{message.message}</p>
+          <p className="text-lg text-gray-800 text-center">{message.content}</p>
         </div>
+        {/* 
+        TODO: This is for card content, that we will figure out later
         <div className="w-full flex flex-wrap gap-4">
             {message.content.map((card, index) => (
             <div key={index} className="w-full bg-white rounded-lg border border-gray-200 max-w-sm">
@@ -55,14 +40,14 @@ const ApikaModule: React.FC = () => {
                 </div>
             </div>
             ))}
-        </div>
+        </div> */}
       </div>
     );
   };
 
   return (
     <div className="h-full w-full overflow-auto p-6">
-      {currentMessage && renderMessage(currentMessage)}
+      {apikaMessage && renderMessage(apikaMessage)}
     </div>
   );
 };

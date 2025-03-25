@@ -2,7 +2,7 @@ import React from "react";
 
 interface ChatBubbleProps {
   text: string;
-  sender: "user" | "apika";
+  sender: "user" | "ai";
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ text, sender }) => {

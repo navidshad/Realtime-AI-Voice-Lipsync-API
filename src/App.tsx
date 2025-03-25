@@ -4,7 +4,6 @@ import { Button } from "./components/shared/Button";
 import { Assistant } from "./components/Assistant";
 import { twMerge } from "tailwind-merge";
 import { JotaiProvider } from "./providers/JotaiProvider";
-import { CounterExample } from "./components/examples/CounterExample";
 import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
@@ -62,7 +61,6 @@ export function App() {
             />
           </Routes>
         </div>
-        <CounterExample />
       </Router>
     </JotaiProvider>
   );
