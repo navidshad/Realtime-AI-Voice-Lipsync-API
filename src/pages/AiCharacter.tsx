@@ -5,7 +5,7 @@ import { conversationDialogsAtom } from "../store/atoms";
 import TalkingHeadAvatar, {
   TalkingHeadRef,
 } from "../character/TalkingHeadAvatar";
-import { generateLipSyncData } from "../ai-logic/utils";
+import { generateLipSyncData } from "../character/utils";
 
 export const AiCharacter: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);

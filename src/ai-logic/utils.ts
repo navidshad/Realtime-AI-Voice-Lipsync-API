@@ -33,10 +33,3 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
 		throw new Error("Failed to create the live session");
 	}
 }
-
-export async function generateLipSyncData(text: string) {
-	const r = await fetch(`http://localhost:8080/lipsinc/generate?text=${encodeURIComponent(text)}`);
-	const data = await r.json() as AudioData;
-
-	return data; // Return as is if not base64 encoded
-}

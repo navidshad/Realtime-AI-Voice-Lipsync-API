@@ -141,6 +141,7 @@ function convertToTalkingHeadFormat(rhubarbData, sampleRate) {
     visemes,
     vtimes,
     vdurations,
+    totalDurationInMs: duration * 1000,
   };
 }
 
