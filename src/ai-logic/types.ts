@@ -4,6 +4,21 @@ export interface ConversationDialog {
 	speaker: 'user' | 'ai';
 }
 
+export type AiTools = {
+	[key: string]: {
+		definition: {
+			type: 'function';
+			name: string;
+			description: string;
+			parameters?: {
+				type: string;
+				properties: Record<string, any>;
+				required: string[];
+			};
+		};
+		handler: (args: any) => { success: boolean;[key: string]: any };
+	};
+};
 export interface TokenUsage {
 	total_tokens: number;
 	input_tokens: number;
