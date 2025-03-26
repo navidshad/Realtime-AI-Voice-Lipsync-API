@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
 import { useAtom } from "jotai";
 import { conversationDialogsAtom } from "../store/atoms";
-import { useFlowManager } from "../ai-logic/useFlowManagr";
+import { useFlowManager } from "../ai-logic/useFlowManager";
 
 export const AiAssistantFlow01: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
