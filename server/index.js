@@ -18,10 +18,13 @@ const app = express();
 const SERVER_PORT = process.env.PORT || 8080;
 const isProduction = process.env.NODE_ENV === "production";
 
-// Enable CORS in development
-if (!isProduction) {
-  app.use(cors());
-}
+// // Enable CORS in development
+// if (!isProduction) {
+//   app.use(cors());
+// }
+
+//TODO: let's enable CORS in production too, temporarily (remove this later)
+app.use(cors());
 
 // API endpoints
 const apiRouter = express.Router();
