@@ -1,5 +1,6 @@
 // TODO: Move this to the server side
 import { EphemeralToken } from "./types";
+import {APIKA_SERVICE_URL} from "../constants";
 
 export async function requestLiveSessionEphemeralToken(additionalSetup: {
 	voice: string;
@@ -15,7 +16,7 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
 
 		const base64Data = window.btoa(JSON.stringify(additionalSetup));
 
-		const r = await fetch(process.env.APIKA_SERVICE_URL + "/api/get-token?" + 'data=' + base64Data);
+		const r = await fetch(`${APIKA_SERVICE_URL}/api/get-token?` + 'data=' + base64Data);
 
 		if (r.status < 200 || r.status >= 299) {
 			const body = await r.json();
