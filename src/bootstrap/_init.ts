@@ -1,3 +1,5 @@
+import {APIKA_SERVICE_URL, isLocalhost} from "../constants";
+
 export type Config = {
   autoShow: boolean;
 }
@@ -81,7 +83,7 @@ const createShadowDOM = function() {
 const loadCustomStyles = function() {
   if (!shadowRoot) return Promise.reject('Shadow DOM not initialized');
   
-  return fetch(`/apika.css?v=${Date.now()}`)
+  return fetch( `${isLocalhost ? "" : APIKA_SERVICE_URL}/apika.css?v=${Date.now()}`)
     .then(response => {
       if (!response.ok) throw new Error('Failed to load custom CSS');
       return response.text();
@@ -100,7 +102,7 @@ const loadCustomStyles = function() {
 const loadScript = function() {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `/apika.js?v=${Date.now()}`;
+    script.src = `${isLocalhost ? "" : APIKA_SERVICE_URL}/apika.js?v=${Date.now()}`;
     script.onload = () => resolve(true);
     script.onerror = () => reject('Failed to load app script');
     document.head.appendChild(script);
