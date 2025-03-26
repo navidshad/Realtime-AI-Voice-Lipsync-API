@@ -22,5 +22,5 @@ serve_main:
   extends: .serve
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
+      when: on_success
   environment: main

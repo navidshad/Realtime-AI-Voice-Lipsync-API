@@ -17,8 +17,7 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
 		const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
 			method: "POST",
 			headers: {
-				// @ts-ignore
-				Authorization: `Bearer ${window?.OPENAI_API_KEY}`,
+				Authorization: `Bearer OPENAI_API_KEY`,
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
