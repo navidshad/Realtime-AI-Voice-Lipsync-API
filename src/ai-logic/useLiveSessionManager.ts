@@ -9,7 +9,7 @@ import {
 	tokenUsageAtom,
 } from '../store/atoms';
 import { requestLiveSessionEphemeralToken } from './utils';
-import { TokenUsage, LiveSession, EphemeralToken } from './types';
+import { TokenUsage, LiveSession, EphemeralToken, AiTools } from './types';
 
 export function useLiveSessionManager() {
 	// State atoms
@@ -302,6 +302,31 @@ export function useLiveSessionManager() {
 
 		updateConversationDialogs(message, id, 'user');
 	}
+	// Update the session config (instructions and tools)
+	const updateSessionConfig = (instructions: string, tools: AiTools) => {
+		if (!dataChannelRef.current) {
+			throw new Error('No data channel available to send message');
+		}
+
+		const eventObject = {
+			"type": "session.update",
+			"session": {}
+		}
+
+		if (instructions) {
+			// @ts-ignore
+			eventObject.session["instructions"] = instructions;
+		}
+
+		if (tools) {
+			// @ts-ignore
+			eventObject.session["tools"] = Object.values(tools).map((t) => t.definition);
+			sessionToolsRef.current = tools;
+		}
+
+		dataChannelRef.current.send(JSON.stringify(eventObject));
+		triggerConversation('instructions updated');
+	}
 
 	const updateConversationDialogs = (content: string, id: string, speaker: 'user' | 'ai') => {
 		setConversationDialogs(prev => {
@@ -427,6 +452,7 @@ export function useLiveSessionManager() {
 		sendTextMessage,
 		clearConversationDialogs,
 		toggleMicrophone,
+		updateSessionConfig,
 		microphoneTrackRef
 	};
 } 
