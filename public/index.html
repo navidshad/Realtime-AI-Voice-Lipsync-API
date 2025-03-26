@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="theme-color" content="#000000"/>
-    <meta name="description" content="React 19 Application"/>
-    <title>React 19 App</title>
     <meta charset="UTF-8">
-    <link href="/styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apika - AI Assistant</title>
+    <base href="/">
+    <style>
+        body {
+           background-color: beige;
+        }
+    </style>
 </head>
 <body>
-<noscript>You need to enable JavaScript to run this app.</noscript>
-<div id="root"></div>
-<script type="module" src="/bundle.staging.js"></script>
+<h2>Parent HTML</h2>
+<button
+        onclick="apika.show()"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    Parent Trigger BUTTON
+</button>
+<script src="init.js" onload="apika.init({autoShow: false})"></script>
 </body>
 </html> 

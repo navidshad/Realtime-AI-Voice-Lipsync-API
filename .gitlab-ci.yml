@@ -1,0 +1,50 @@
+stages:
+  - qualify
+  - build
+  - deploy
+  - serve
+
+variables:
+  PIPELINE_VARS_FILE: ./pipeline_vars.env
+  IMAGE_URL: "us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/images/${CI_PROJECT_NAME}"
+  IMAGE_TAG: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+  SERVICE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
+  PORT: 8080  # Explicitly set PORT for Cloud Run
+
+.gitlab_job:
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  before_script:
+    - |
+      echo "=== Pipeline Environment Variables ==="
+      echo "CI_PROJECT_NAME: ${CI_PROJECT_NAME}"
+      echo "CI_COMMIT_BRANCH: ${CI_COMMIT_BRANCH}"
+      echo "CI_COMMIT_SHORT_SHA: ${CI_COMMIT_SHORT_SHA}"
+      echo "GCP_PROJECT_ID: ${GCP_PROJECT_ID}"
+      echo "IMAGE_URL: ${IMAGE_URL}"
+      echo "IMAGE_TAG: ${IMAGE_TAG}"
+      echo "SERVICE_NAME: ${SERVICE_NAME}"
+      echo "DOCKER_HOST: ${DOCKER_HOST}"
+      echo "PORT: ${PORT}"
+      echo "APIKA_APP_URL: ${APIKA_APP_URL}"
+    - |
+      echo "=== Pipeline Variables File ==="
+      echo "PIPELINE_VARS_FILE: ${PIPELINE_VARS_FILE}"
+      echo "Pipeline vars file contents:"
+      cat ${PIPELINE_VARS_FILE} || echo "File not found or empty"
+    - |
+      echo "=== Docker Info ==="
+      echo ${DEPLOY_SERVICE_ACCOUNT} > ${HOME}/gcloud-service-key.json
+      cat ${HOME}/gcloud-service-key.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+      docker info
+      echo "=== Docker Version ==="
+      docker version
+      rm ${HOME}/gcloud-service-key.json
+
+include:
+  - local: .gitlab/qualify_jobs.yml
+  - local: .gitlab/build_jobs.yml
+  - local: .gitlab/deploy_jobs.yml
+  - local: .gitlab/serve_jobs.yml

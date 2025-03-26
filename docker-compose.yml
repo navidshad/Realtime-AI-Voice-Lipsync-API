@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NODE_MODE=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "yarn install && yarn dev"
+    profiles:
+      - dev
+
+  # Production backend (no host volume mounts)
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: production
+    ports:
+      - "3030:3030"
+    environment:
+      - NODE_ENV=production
+    command: sh -c "yarn install && node index.js"
+    profiles:
+      - production
+
+  # Development backend (with volume mounts)
+  backend-dev:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: development
+    ports:
+      - "3030:3030"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./server:/app
+      - backend_node_modules:/app/node_modules
+    command: sh -c "yarn install && yarn start"
+    profiles:
+      - dev
+
+volumes:
+  backend_node_modules:
