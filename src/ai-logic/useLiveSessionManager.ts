@@ -142,27 +142,23 @@ export function useLiveSessionManager() {
 	};
 
 	const onSessionEvent = (eventData: any) => {
-		console.log('onSessionEvent', eventData);
 		if (onUpdateCallbackRef.current) {
 			onUpdateCallbackRef.current(eventData);
 		}
 
 		const { type, event_id } = eventData;
-
 		if (type === 'session.created') {
 			console.log('Session created', event_id);
 			if (onSessionCreatedCallbackRef.current) {
 				onSessionCreatedCallbackRef.current();
 			}
 		}
-
 		else if (type === 'response.audio_transcript.delta') {
 			const { delta, response_id } = eventData;
 			updateConversationDialogs(delta, response_id, 'ai');
 		}
 		else if (type === 'conversation.item.input_audio_transcription.completed') {
 			const { item_id, transcript } = eventData;
-
 			if (transcript) {
 				updateConversationDialogs(transcript, item_id, 'user');
 				updateLiveSessionRecordOnServer();
@@ -431,5 +427,6 @@ export function useLiveSessionManager() {
 		sendTextMessage,
 		clearConversationDialogs,
 		toggleMicrophone,
+		microphoneTrackRef
 	};
 } 
