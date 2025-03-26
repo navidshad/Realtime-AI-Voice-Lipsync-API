@@ -1,4 +1,3 @@
-import { watch } from "rollup";
 import { terser } from "rollup-plugin-terser";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
@@ -77,7 +76,9 @@ const commonPlugins = [
     "process.env.GET_SESSION_DATA_URL": JSON.stringify(
       process.env.GET_SESSION_DATA_URL
     ),
-    "process.env.APIKA_APP_URL": JSON.stringify(process.env.APIKA_APP_URL),
+    "process.env.APIKA_APP_URL": isDevMode
+      ? JSON.stringify(process.env.APIKA_APP_URL)
+      : "",
     BUNDLE_VERSION: JSON.stringify(getVersion()),
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   }),

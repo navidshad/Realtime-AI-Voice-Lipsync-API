@@ -8,6 +8,19 @@ import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
 import { AiAssistantFlow01 } from "./pages/AiAssistanFlow01";
+import { Config } from "./bootstrap/_init";
+
+// Declare the global apika interface
+declare global {
+  interface Window {
+    apika: {
+      show: () => void;
+      hide: () => void;
+      init: (options: any) => void;
+      open: ((config: Config) => void) | null;
+    };
+  }
+}
 
 export function App() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
@@ -83,13 +96,16 @@ export function App() {
                       >
                         Start Assistant
                       </Button>
-                      <Assistant
-                        className={twMerge(
-                          isAssistantOpen
-                            ? "opacity-100"
-                            : "opacity-0 pointer-events-none"
-                        )}
-                      />
+                      {isAssistantOpen && (
+                        <div
+                          className={twMerge(
+                            "transition-opacity duration-300",
+                            "opacity-100"
+                          )}
+                        >
+                          <Assistant className="opacity-100" />
+                        </div>
+                      )}
                     </header>
                   </div>
                 </>

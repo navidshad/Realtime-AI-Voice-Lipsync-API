@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
+import { useAudioVisualiser } from "./useAudioVisualiser";
 
 
 export const useApika = () => {
@@ -12,10 +13,11 @@ export const useApika = () => {
         toggleMicrophone,
         isMicrophoneMuted,
         sessionStarted,
+        microphoneTrackRef
       } = useLiveSessionManager();
     const initializedRef = useRef(false);
     const audioRef = useRef<HTMLAudioElement>(null);
-
+    const { audioAnalyser } = useAudioVisualiser(microphoneTrackRef);
     useEffect(() => {
         if (!initializedRef.current) {
           initializedRef.current = true;
@@ -48,5 +50,7 @@ export const useApika = () => {
         toggleMicrophone,
         isMicrophoneMuted,
         sessionStarted,
+        audioRef,
+        audioAnalyser
       }
 }
