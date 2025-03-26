@@ -10,6 +10,7 @@ variables:
   IMAGE_TAG: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
   SERVICE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
   PORT: 8080  # Explicitly set PORT for Cloud Run
+  APIKA_APP_URL: "https://${SERVICE_NAME}-${CI_ENVIRONMENT_SLUG}.a.run.app"  # URL for Cloud Run service
 
 .gitlab_job:
   image: docker:24.0.5
@@ -17,6 +18,7 @@ variables:
     - name: docker:24.0.5-dind
       alias: docker
   before_script:
+    - apk add --no-cache gettext
     - |
       echo "=== Pipeline Environment Variables ==="
       echo "CI_PROJECT_NAME: ${CI_PROJECT_NAME}"
@@ -30,10 +32,17 @@ variables:
       echo "PORT: ${PORT}"
       echo "APIKA_APP_URL: ${APIKA_APP_URL}"
     - |
-      echo "=== Pipeline Variables File ==="
-      echo "PIPELINE_VARS_FILE: ${PIPELINE_VARS_FILE}"
-      echo "Pipeline vars file contents:"
-      cat ${PIPELINE_VARS_FILE} || echo "File not found or empty"
+      echo "=== Creating Environment Files ==="
+      # Create frontend .env
+      envsubst < .env.mappings > .env
+      echo "Frontend .env contents:"
+      cat .env
+      # Create server .env if exists
+      if [ -f "server/.env.mappings" ]; then
+        envsubst < server/.env.mappings > server/.env
+        echo "Server .env contents:"
+        cat server/.env
+      fi
     - |
       echo "=== Docker Info ==="
       echo ${DEPLOY_SERVICE_ACCOUNT} > ${HOME}/gcloud-service-key.json

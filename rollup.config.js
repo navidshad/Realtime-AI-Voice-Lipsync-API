@@ -76,9 +76,7 @@ const commonPlugins = [
     "process.env.GET_SESSION_DATA_URL": JSON.stringify(
       process.env.GET_SESSION_DATA_URL
     ),
-    "process.env.APIKA_APP_URL": isDevMode
-      ? JSON.stringify(process.env.APIKA_APP_URL)
-      : "",
+    "process.env.APIKA_APP_URL": JSON.stringify(process.env.APIKA_APP_URL),
 
     //In dev mode we have both FE and BE, but in build mode we have just 1 instance app url (based on BE)
     "process.env.APIKA_SERVICE_URL": isDevMode ?
