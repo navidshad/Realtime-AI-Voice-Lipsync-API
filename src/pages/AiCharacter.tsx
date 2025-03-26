@@ -5,7 +5,7 @@ import { conversationDialogsAtom } from "../store/atoms";
 import TalkingHeadAvatar, {
   TalkingHeadRef,
 } from "../character/TalkingHeadAvatar";
-import { generateLipSyncData } from "../character/utils";
+import { generateSpeechWithLipSync } from "../character/utils";
 
 export const AiCharacter: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -30,22 +30,6 @@ export const AiCharacter: React.FC = () => {
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
-      createLiveSession({
-        sessionDetails: {
-          instructions:
-            "You are a helpful AI assistant. Help the user with their questions.",
-          onlyText: true,
-          turnDetectionSilenceDuration: 1000,
-        },
-        tools: {}, // Add your tools here
-        audioRef: audioRef.current,
-        onSessionCreated() {
-          triggerConversation(
-            "User is here, greeting and start the conversation"
-          );
-        },
-        onUpdate: onUpdate,
-      });
     }
     return () => {
       if (initializedRef.current) {
@@ -53,6 +37,25 @@ export const AiCharacter: React.FC = () => {
       }
     };
   }, []);
+
+  function initializeLiveSession() {
+    createLiveSession({
+      sessionDetails: {
+        instructions:
+          "You are a helpful AI assistant. Help the user with their questions.",
+        onlyText: true,
+        turnDetectionSilenceDuration: 1000,
+      },
+      tools: {}, // Add your tools here
+      audioRef: audioRef.current,
+      onSessionCreated() {
+        triggerConversation(
+          "User is here, greeting and start the conversation"
+        );
+      },
+      onUpdate: onUpdate,
+    });
+  }
 
   const handleChatboxToggle = () => {
     setShowChatbox((prev) => !prev);
@@ -79,7 +82,7 @@ export const AiCharacter: React.FC = () => {
 
     if (type === "response.done") {
       const dialoge = response.output[0].content[0].transcript;
-      const lipSyncData = await generateLipSyncData(dialoge);
+      const lipSyncData = await generateSpeechWithLipSync(dialoge);
       avatarRef.current?.provideLipSyncData(lipSyncData as any);
     }
   }
@@ -311,8 +314,12 @@ export const AiCharacter: React.FC = () => {
       <TalkingHeadAvatar
         ref={avatarRef}
         characterUrl="/models/634c5abfd5dcded8a45e70e0.glb"
+        bodyType="M"
+        initialMood="neutral"
+        lipsyncLang="en"
         onReady={(head) => {
           console.log("Avatar is ready");
+          initializeLiveSession();
           // You can also control the avatar directly through the head instance
         }}
       />
@@ -321,3 +328,6 @@ export const AiCharacter: React.FC = () => {
     </div>
   );
 };
+function generateSpeechAndLipSyncFromText(dialoge: any) {
+  throw new Error("Function not implemented.");
+}

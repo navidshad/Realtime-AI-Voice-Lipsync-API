@@ -1,6 +1,7 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import type { TalkingHead } from "talkinghead";
-import { createFakeLipSync } from "./utils";
+import { AudioData } from "./types";
+// import { createFakeLipSync } from "./utils";
 
 // Define props interface
 interface TalkingHeadProps {
@@ -8,6 +9,7 @@ interface TalkingHeadProps {
   bodyType?: "M" | "F";
   initialView?: "full" | "upper" | "mid" | "head";
   initialMood?: string;
+  lipsyncLang?: string;
   height?: string | number;
   width?: string | number;
   onReady?: (head: TalkingHead) => void;
@@ -34,6 +36,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       initialMood = "neutral",
       height = "100%",
       width = "100%",
+      lipsyncLang = "en",
       onReady = () => {},
       onError = () => {},
     },
@@ -79,6 +82,9 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
             // Load the avatar
             await head.showAvatar({
               url: characterUrl,
+              body: bodyType,
+              avatarMood: initialMood,
+              lipsyncLang: lipsyncLang,
             });
 
             // Call the ready callback
@@ -106,21 +112,25 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
 
     // Method to make the avatar speak with custom lip-sync
     const speak = (duration = 3000) => {
-      if (headRef.current) {
-        const lipSyncData = createFakeLipSync(duration);
-        headRef.current.speakAudio(lipSyncData as any);
-
-        // Add natural head movements
-        headRef.current.lookAt(
-          window.innerWidth / 2 + (Math.random() - 0.5) * 200,
-          window.innerHeight / 2 + (Math.random() - 0.5) * 200,
-          duration / 2
-        );
-      }
+      // if (headRef.current) {
+      //   const lipSyncData = createFakeLipSync(duration);
+      //   headRef.current.speakAudio(lipSyncData as any);
+      //   // Add natural head movements
+      //   headRef.current.lookAt(
+      //     window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+      //     window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+      //     duration / 2
+      //   );
+      // }
     };
 
-    const provideLipSyncData = (lipSyncData: AudioData) => {
+    const provideLipSyncData = async (lipSyncData: AudioData) => {
       if (headRef.current) {
+        // @ts-ignore
+        lipSyncData.audio = await headRef.current?.audioCtx.decodeAudioData(
+          lipSyncData.audio
+        );
+
         headRef.current.speakAudio(lipSyncData as any);
       }
     };

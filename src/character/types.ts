@@ -9,12 +9,7 @@ export interface AudioDataResponse {
 }
 
 export interface AudioData {
-	audio: any;
-	visemes: string[];
-	vtimes: number[];
-	vdurations: number[];
-	words?: string[];
-	wtimes?: number[];
-	wdurations?: number[];
+	audio: ArrayBuffer;
+	[key: string]: any;
 }
 

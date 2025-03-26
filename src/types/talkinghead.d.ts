@@ -3,12 +3,10 @@ declare module "talkinghead" {
 
 	export interface Audio {
 		audio: ArrayBuffer[];
-		visemes: string[];
-		vtimes: number[];
-		vdurations: number[];
 		words: string[];
 		wtimes: number[];
 		wdurations: number[];
+		[key: string]: any;
 	}
 
 	export interface TalkingHeadConfig {
@@ -28,7 +26,7 @@ declare module "talkinghead" {
 
 	export class TalkingHead {
 		constructor(element: HTMLElement, config: Partial<TalkingHeadConfig>);
-		showAvatar({ url, onprogress }: { url: string, onprogress?: progressfn }): Promise<void>;
+		showAvatar(options: { url: string, body: string, avatarMood: string, lipsyncLang: string, onprogress?: progressfn }): Promise<void>;
 		stop(): void;
 		speakAudio(data: Audio): void;
 		lookAt(x: number, y: number, duration: number): void;
