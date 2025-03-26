@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import {twMerge} from "tailwind-merge";
-import ChatModule from './modules/chat';
-import ApikaModule from './modules/apika';
-import { useApika } from '../hooks/useApika';
-import ChatHistoryIcon from './unit/chat-history-icon';
+import React, { useState } from "react";
+import { twMerge } from "tailwind-merge";
+import ChatModule from "./modules/chat";
+import ApikaModule from "./modules/apika";
+import { useApika } from "../hooks/useApika";
+import ChatHistoryIcon from "./unit/chat-history-icon";
 
-export const Assistant = ({className = ''}) => {
+export const Assistant = ({ className = "", isReady = false }) => {
   const {
     sendTextMessage,
     toggleMicrophone,
@@ -31,10 +31,19 @@ export const Assistant = ({className = ''}) => {
             audioAnalyser={audioAnalyser}
           />
         </div>
-        {!showChatHistory && <ChatHistoryIcon onClick={() => setShowChatHistory(!showChatHistory)} />}
-        {showChatHistory && <ChatModule sendTextMessage={sendTextMessage} onToggleChatHistory={() => setShowChatHistory(!showChatHistory)} />}
+        {!showChatHistory && (
+          <ChatHistoryIcon
+            onClick={() => setShowChatHistory(!showChatHistory)}
+          />
+        )}
+        {showChatHistory && (
+          <ChatModule
+            sendTextMessage={sendTextMessage}
+            onToggleChatHistory={() => setShowChatHistory(!showChatHistory)}
+          />
+        )}
       </div>
       <audio ref={audioRef} />
     </div>
   );
-}
+};

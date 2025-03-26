@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Button } from "./components/shared/Button";
 import { Assistant } from "./components/Assistant";
@@ -7,7 +7,7 @@ import { JotaiProvider } from "./providers/JotaiProvider";
 import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
-import {Config} from "./bootstrap/_init";
+import { Config } from "./bootstrap/_init";
 
 // Declare the global apika interface
 declare global {
@@ -26,26 +26,26 @@ export function App() {
 
   //Expose the open function to the global apika object
   const open = (config: Config) => {
-    console.log('Opening APIKA with config:', config);
+    console.log("Opening APIKA with config:", config);
     setIsAssistantOpen(true);
   };
 
   const hide = () => {
     setIsAssistantOpen(false);
-  }
+  };
 
   // Connect to the global apika object
   useEffect(() => {
     // Dispatch event with the setter function
-    const event = new CustomEvent('APIKA_READY', {
-      detail: {setIsAssistantOpen}
+    const event = new CustomEvent("APIKA_READY", {
+      detail: { setIsAssistantOpen },
     });
     window.dispatchEvent(event);
 
     // Allow direct calls from parent window
     if (window.apika) {
-      window.apika.open = open
-      window.apika.hide = hide
+      window.apika.open = open;
+      window.apika.hide = hide;
     }
   }, []);
 
@@ -85,13 +85,16 @@ export function App() {
                       >
                         Start Assistant
                       </Button>
-                      <Assistant
-                        className={twMerge(
-                          isAssistantOpen
-                            ? "opacity-100"
-                            : "opacity-0 pointer-events-none"
-                        )}
-                      />
+                      {isAssistantOpen && (
+                        <div
+                          className={twMerge(
+                            "transition-opacity duration-300",
+                            "opacity-100"
+                          )}
+                        >
+                          <Assistant className="opacity-100" />
+                        </div>
+                      )}
                     </header>
                   </div>
                 </>
