@@ -12,31 +12,16 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
 	}
 }) {
 	try {
-		// https://platform.openai.com/docs/guides/realtime-webrtc#creating-an-ephemeral-token
-		// https://platform.openai.com/docs/api-reference/realtime-sessions/create
-		const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer OPENAI_API_KEY`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				model: "gpt-4o-mini-realtime-preview",
-				temperature: 0.6,
-				input_audio_transcription: {
-					model: "whisper-1",
-				},
-				...additionalSetup,
-			}),
-		});
+
+		const base64Data = window.btoa(JSON.stringify(additionalSetup));
+
+		const r = await fetch(process.env.APIKA_SERVICE_URL + "/api/get-token?" + 'data=' + base64Data);
 
 		if (r.status < 200 || r.status >= 299) {
-			const body = await r.json().then((data: any) => console.error(data));
-
+			const body = await r.json();
 			console.error("Failed to create the live session", body);
-
 			throw new Error(
-				`Failed to create the live session, Openai status: ${r.status}`
+				`Failed to create the live session, status: ${r.status}`
 			);
 		}
 
