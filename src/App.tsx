@@ -7,6 +7,7 @@ import { JotaiProvider } from "./providers/JotaiProvider";
 import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
+import { AiAssistantFlow01 } from "./pages/AiAssistanFlow01";
 import { Config } from "./bootstrap/_init";
 
 // Declare the global apika interface
@@ -57,6 +58,10 @@ export function App() {
             <Route path="/ai-raw" element={<AiRaw />} />
             <Route path="/ai-assistant" element={<AiAssistant />} />
             <Route
+              path="/ai-assistant-flow01"
+              element={<AiAssistantFlow01 />}
+            />
+            <Route
               path="/"
               element={
                 <>
@@ -65,6 +70,12 @@ export function App() {
                       <div className="container mx-auto flex justify-center space-x-4">
                         <Link to="/ai-raw" className=" hover:text-gray-700">
                           AI Raw
+                        </Link>
+                        <Link
+                          to="/ai-assistant-flow01"
+                          className=" hover:text-gray-700"
+                        >
+                          AI Assistant Flow 01
                         </Link>
                         <Link
                           to="/ai-assistant"

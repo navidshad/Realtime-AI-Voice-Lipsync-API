@@ -2,20 +2,54 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
 import { useAtom } from "jotai";
 import { conversationDialogsAtom } from "../store/atoms";
+import { useFlowManager } from "../ai-logic/useFlowManagr";
 
-export const AiRaw: React.FC = () => {
+export const AiAssistantFlow01: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const {
-    createLiveSession,
+    initializeFlow,
     endLiveSession,
-    triggerConversation,
     sendTextMessage,
-    clearConversationDialogs,
     toggleMicrophone,
     isMicrophoneMuted,
     sessionStarted,
-  } = useLiveSessionManager();
+  } = useFlowManager({
+    steps: [
+      {
+        label: "Step 1",
+        instructions:
+          "Help the user to select a city from all the cities in the world. dont talk about detail in this step, just ask the user to select a city.",
+        tools: {},
+      },
+      {
+        label: "Step 2",
+        instructions: `
+        Goal: Now let's talk about the selected city.
+        Instructions: Talk about the selected city in detail.
+        Finish signal: if user shows he or she got the enough information about the city.
+        `,
+        tools: {},
+      },
+      {
+        label: "Step 3",
+        instructions: "Finish the conversation, and say goodbye",
+        tools: {
+          finishConversation: {
+            definition: {
+              type: "function",
+              name: "finishConversation",
+              description: "Finish the conversation, and say goodbye",
+            },
+            handler: () => {
+              alert("Conversation finished");
+              return { success: true, message: "Conversation finished" };
+            },
+          },
+        },
+      },
+    ],
+  });
 
   const [conversationDialogs] = useAtom(conversationDialogsAtom);
   const [showChatbox, setShowChatbox] = useState(false);
@@ -25,21 +59,7 @@ export const AiRaw: React.FC = () => {
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
-      createLiveSession({
-        sessionDetails: {
-          instructions:
-            "You are a helpful AI assistant. Help the user with their questions.",
-          voice: "alloy",
-          turnDetectionSilenceDuration: 1000,
-        },
-        tools: {}, // Add your tools here
-        audioRef: audioRef.current,
-        onSessionCreated() {
-          triggerConversation(
-            "User is here, greeting and start the conversation"
-          );
-        },
-      });
+      initializeFlow({ audioRef: audioRef.current, onUpdate });
     }
     return () => {
       if (initializedRef.current) {
@@ -47,6 +67,10 @@ export const AiRaw: React.FC = () => {
       }
     };
   }, []);
+
+  const onUpdate = (eventData: any) => {
+    console.log("onUpdate", eventData);
+  };
 
   const handleChatboxToggle = () => {
     setShowChatbox((prev) => !prev);

@@ -4,7 +4,7 @@ import { EphemeralToken } from "./types";
 export async function requestLiveSessionEphemeralToken(additionalSetup: {
 	voice: string;
 	instructions: string;
-	tools: string[];
+	tools: object;
 	tool_choice: string;
 	turn_detection: {
 		type: string;

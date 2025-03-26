@@ -27,47 +27,12 @@ export function useLiveSessionManager() {
 	const microphoneStreamRef = useRef<MediaStream | null>(null);
 	const microphoneTrackRef = useRef<MediaStreamTrack | null>(null);
 	const onUpdateCallbackRef = useRef<((data: any) => void) | null>(null);
-	const onSessionCreatedCallbackRef = useRef<(() => void) | null>(null);
+	const onSessionCreatedCallbackRef = useRef<((eventData: any) => void) | null>(null);
 	const sessionToolsRef = useRef<{ [key: string]: any } | null>(null);
 
-	const startLiveSession = async (session: LiveSession) => {
-		if (peerConnectionRef.current === null) {
-			throw new Error('Peer connection not set up');
-		}
-
-		// Set up data channel for sending and receiving events
-		dataChannelRef.current = peerConnectionRef.current.createDataChannel('oai-events');
-
-		dataChannelRef.current.addEventListener('message', (e) => {
-			const data = JSON.parse(e.data);
-			onSessionEvent(data);
-		});
-
-		// Start the session using the Session Description Protocol (SDP)
-		const offer = await peerConnectionRef.current.createOffer();
-		await peerConnectionRef.current.setLocalDescription(offer);
-
-		const baseUrl = 'https://api.openai.com/v1/realtime';
-		const model = session.model;
-		const EPHEMERAL_KEY = session.client_secret.value;
-
-		const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
-			method: 'POST',
-			body: offer.sdp,
-			headers: {
-				Authorization: `Bearer ${EPHEMERAL_KEY}`,
-				'Content-Type': 'application/sdp',
-			},
-		});
-
-		const answer = {
-			type: 'answer',
-			sdp: await sdpResponse.text(),
-		};
-
-		await peerConnectionRef.current.setRemoteDescription(answer as any);
-		setSessionStarted(true);
-	};
+	/* 
+	 * Creating and configuring a live session 
+	*/
 
 	const createLiveSession = async (options: {
 		sessionDetails: {
@@ -75,7 +40,7 @@ export function useLiveSessionManager() {
 			voice?: string;
 			turnDetectionSilenceDuration?: number;
 		};
-		tools: { [key: string]: any };
+		tools: AiTools;
 		onUpdate?: (data: any) => void;
 		onSessionCreated?: () => void;
 		audioRef: HTMLAudioElement | null;
@@ -119,16 +84,55 @@ export function useLiveSessionManager() {
 		}
 	};
 
+	const startLiveSession = async (session: LiveSession) => {
+		if (peerConnectionRef.current === null) {
+			throw new Error('Peer connection not set up');
+		}
+
+		// Set up data channel for sending and receiving events
+		dataChannelRef.current = peerConnectionRef.current.createDataChannel('oai-events');
+
+		dataChannelRef.current.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
+			onSessionEvent(data);
+		});
+
+		// Start the session using the Session Description Protocol (SDP)
+		const offer = await peerConnectionRef.current.createOffer();
+		await peerConnectionRef.current.setLocalDescription(offer);
+
+		const baseUrl = 'https://api.openai.com/v1/realtime';
+		const model = session.model;
+		const EPHEMERAL_KEY = session.client_secret.value;
+
+		const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+			method: 'POST',
+			body: offer.sdp,
+			headers: {
+				Authorization: `Bearer ${EPHEMERAL_KEY}`,
+				'Content-Type': 'application/sdp',
+			},
+		});
+
+		const answer = {
+			type: 'answer',
+			sdp: await sdpResponse.text(),
+		};
+
+		await peerConnectionRef.current.setRemoteDescription(answer as any);
+		setSessionStarted(true);
+	};
+
 	const setupRTP = async () => {
-		// if (!audioElementRef.current) {
-		// 	throw new Error('Audio element not provided');
-		// }
+		if (!audioElementRef.current) {
+			throw new Error('Audio element not provided');
+		}
 
 		// Create a peer connection
 		peerConnectionRef.current = new RTCPeerConnection();
 
 		// Set up to play remote audio from the model
-		// audioElementRef.current.autoplay = true;
+		audioElementRef.current.autoplay = true;
 		peerConnectionRef.current.ontrack = (e) => {
 			if (audioElementRef.current) audioElementRef.current.srcObject = e.streams[0];
 		};
@@ -150,7 +154,7 @@ export function useLiveSessionManager() {
 		if (type === 'session.created') {
 			console.log('Session created', event_id);
 			if (onSessionCreatedCallbackRef.current) {
-				onSessionCreatedCallbackRef.current();
+				onSessionCreatedCallbackRef.current(eventData);
 			}
 		}
 		else if (type === 'response.audio_transcript.delta') {
@@ -253,6 +257,14 @@ export function useLiveSessionManager() {
 		dataChannelRef.current.send(JSON.stringify(continueResponse));
 	};
 
+	/* End of creating and configuring a live session */
+
+	/* 
+	 * Sending events to the AI 
+	*/
+
+	// Trigger the ai to respond to the given instructions, 
+	// or resume the conversation after a pause or function call
 	const triggerConversation = (instructions: string = '') => {
 		if (!dataChannelRef.current) {
 			throw new Error('No data channel available to send message');
@@ -272,6 +284,7 @@ export function useLiveSessionManager() {
 		dataChannelRef.current.send(JSON.stringify(responseCreate));
 	};
 
+	// Send a text message to the AI 
 	const sendTextMessage = (message: string) => {
 		if (!dataChannelRef.current) {
 			throw new Error('No data channel available to send message');
@@ -450,9 +463,9 @@ export function useLiveSessionManager() {
 		endLiveSession,
 		triggerConversation,
 		sendTextMessage,
+		updateSessionConfig,
 		clearConversationDialogs,
 		toggleMicrophone,
-		updateSessionConfig,
 		microphoneTrackRef
 	};
 } 

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { ConversationDialog, LiveSession, TokenUsage } from "../ai-logic/types";
+import { ConversationDialog, TokenUsage, LiveSession } from "../ai-logic/types";
 
 // Example of a basic atom
 export const countAtom = atom(0);
@@ -34,8 +34,7 @@ export const userPreferencesAtom = atom<UserPreferences>({
 export const isLoadingAtom = atom(false);
 
 // Error state atom example
-export const errorAtom = atom<string | null>(null); 
-
+export const errorAtom = atom<string | null>(null);
 
 // Live Session Atoms
 export const liveSessionIdAtom = atom<string | null>(null);
