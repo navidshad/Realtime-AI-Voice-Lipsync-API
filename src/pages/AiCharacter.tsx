@@ -53,6 +53,7 @@ export const AiCharacter: React.FC = () => {
           "User is here, greeting and start the conversation"
         );
       },
+      onAiSoundStreamed: onAiSoundStreamed,
       onUpdate: onUpdate,
     });
   }
@@ -78,13 +79,17 @@ export const AiCharacter: React.FC = () => {
   const audioTempChuks: Record<string, any> = {};
   async function onUpdate(eventData: any) {
     const { type, response } = eventData;
-    // console.log(type, "delta:", delta);
 
-    if (type === "response.done") {
-      const dialoge = response.output[0].content[0].transcript;
-      const lipSyncData = await generateSpeechWithLipSync(dialoge);
-      avatarRef.current?.provideLipSyncData(lipSyncData as any);
-    }
+    // if (type === "response.done") {
+    //   const dialoge = response.output[0].content[0].transcript;
+    //   const lipSyncData = await generateSpeechWithLipSync({ text: dialoge });
+    //   avatarRef.current?.provideLipSyncData(lipSyncData as any);
+    // }
+  }
+
+  async function onAiSoundStreamed(webmBlob: Blob, responseId: string) {
+    const lipSyncData = await generateSpeechWithLipSync({ webmBlob });
+    avatarRef.current?.provideLipSyncData(lipSyncData as any);
   }
 
   // Get the last AI dialog

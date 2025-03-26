@@ -79,8 +79,6 @@ export function useFlowManager(config: FlowConfig) {
 		return { success: true, message: `Transitioned to step "${options.stepLabel}"` };
 	}
 
-
-
 	function getTransitionTool() {
 		const defaultTransitionTool = {
 			definition: {
