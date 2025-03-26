@@ -2,10 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
 import { useAtom } from "jotai";
 import { conversationDialogsAtom } from "../store/atoms";
-import TalkingHeadAvatar from "../character/TalkingHeadAvatar";
+import TalkingHeadAvatar, {
+  TalkingHeadRef,
+} from "../character/TalkingHeadAvatar";
+import { generateLipSyncData } from "../ai-logic/utils";
 
 export const AiCharacter: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const avatarRef = useRef<TalkingHeadRef>(null);
 
   const {
     createLiveSession,
@@ -69,15 +73,14 @@ export const AiCharacter: React.FC = () => {
   };
 
   const audioTempChuks: Record<string, any> = {};
-  function onUpdate(eventData: any) {
-    const { type, event_id, response_id, delta } = eventData;
+  async function onUpdate(eventData: any) {
+    const { type, response } = eventData;
     // console.log(type, "delta:", delta);
 
-    if (type === "response.audio.delta") {
-      audioTempChuks[response_id] += delta;
-    } else if (type === "response.audio.completed") {
-      const audioChunks = audioTempChuks[response_id];
-      console.log(audioChunks);
+    if (type === "response.done") {
+      const dialoge = response.output[0].content[0].transcript;
+      const lipSyncData = await generateLipSyncData(dialoge);
+      avatarRef.current?.provideLipSyncData(lipSyncData as any);
     }
   }
 
@@ -302,7 +305,14 @@ export const AiCharacter: React.FC = () => {
         </div>
       )}
 
-      <TalkingHeadAvatar characterUrl="/models/634c5abfd5dcded8a45e70e0.glb" />
+      <TalkingHeadAvatar
+        ref={avatarRef}
+        characterUrl="/models/634c5abfd5dcded8a45e70e0.glb"
+        onReady={(head) => {
+          console.log("Avatar is ready");
+          // You can also control the avatar directly through the head instance
+        }}
+      />
 
       <audio ref={audioRef} />
     </div>

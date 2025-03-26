@@ -1,5 +1,6 @@
 // TODO: Move this to the server side
 import { EphemeralToken } from "./types";
+import { AudioData, ServerAudioData, ClientAudioData } from "../character/TalkingHeadAvatar";
 
 export async function requestLiveSessionEphemeralToken(additionalSetup: {
 	voice?: string;
@@ -46,4 +47,11 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
 	} catch (error) {
 		throw new Error("Failed to create the live session");
 	}
+}
+
+export async function generateLipSyncData(text: string) {
+	const r = await fetch(`http://localhost:8080/lipsinc/generate?text=${encodeURIComponent(text)}`);
+	const data = await r.json() as AudioData;
+
+	return data; // Return as is if not base64 encoded
 }

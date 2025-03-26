@@ -6,14 +6,14 @@ import React, {
 } from "react";
 import type { TalkingHead } from "talkinghead";
 
-interface AudioData {
-  audio: ArrayBuffer[];
+export interface AudioData {
+  audio: any;
   visemes: string[];
   vtimes: number[];
   vdurations: number[];
-  words: string[];
-  wtimes: number[];
-  wdurations: number[];
+  words?: string[];
+  wtimes?: number[];
+  wdurations?: number[];
 }
 
 // Define props interface
@@ -29,8 +29,9 @@ interface TalkingHeadProps {
 }
 
 // Define ref interface
-interface TalkingHeadRef {
+export interface TalkingHeadRef {
   speak: (duration?: number) => void;
+  provideLipSyncData: (lipSyncData: AudioData) => void;
   setView: (view: "full" | "upper" | "mid" | "head") => void;
   setMood: (mood: string) => void;
   playGesture: (gesture: string, duration?: number, mirror?: boolean) => void;
@@ -54,9 +55,11 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
   ) => {
     const avatarRef = useRef<HTMLDivElement>(null);
     const headRef = useRef<TalkingHead | null>(null);
-
+    const initializedRef = useRef(false);
     // Initialize TalkingHead on component mount
     useEffect(() => {
+      if (initializedRef.current) return;
+      initializedRef.current = true;
       // Import TalkingHead from CDN
       import("talkinghead")
         .then(async ({ TalkingHead }) => {
@@ -179,7 +182,10 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       }
 
       return {
-        audio: [silentAudio.buffer], // PCM buffer array
+        audio: {
+          type: "pcm",
+          data: [silentAudio.buffer], // Wrap buffer in array as it expects array of chunks
+        },
         ...fakeLipSync,
         words: [], // Empty arrays for required fields
         wtimes: [],
@@ -191,7 +197,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
     const speak = (duration = 3000) => {
       if (headRef.current) {
         const lipSyncData = createFakeLipSync(duration);
-        headRef.current.speakAudio(lipSyncData);
+        headRef.current.speakAudio(lipSyncData as any);
 
         // Add natural head movements
         headRef.current.lookAt(
@@ -199,6 +205,12 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
           window.innerHeight / 2 + (Math.random() - 0.5) * 200,
           duration / 2
         );
+      }
+    };
+
+    const provideLipSyncData = (lipSyncData: AudioData) => {
+      if (headRef.current) {
+        headRef.current.speakAudio(lipSyncData as any);
       }
     };
 
@@ -228,6 +240,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       ref,
       () => ({
         speak,
+        provideLipSyncData,
         setView,
         setMood,
         playGesture,

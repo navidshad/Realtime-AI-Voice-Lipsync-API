@@ -141,7 +141,6 @@ function convertToTalkingHeadFormat(rhubarbData, sampleRate) {
     visemes,
     vtimes,
     vdurations,
-    original: rhubarbData,
   };
 }
 
@@ -169,17 +168,38 @@ lipsyncRouter.get("/generate", async (req, res) => {
     // read wave file as raw data
     const waveData = await fs.readFile(audioFiles.wavFile);
 
+    // Convert to Base64 for safe JSON transmission
+    const base64Data = waveData.toString("base64");
+
     await fs.rm(tempDir, { recursive: true, force: true });
 
     // Send response with both lip sync data and audio URLs
     res.json({
-      lipSync: lipSyncData,
-      waveData,
+      ...lipSyncData,
+      audio: {
+        type: "pcm",
+        encoding: "base64",
+        data: base64Data,
+      },
     });
   } catch (error) {
     console.error("Error in generate endpoint:", error);
     res.status(500).json({ error: "Failed to process text to lip sync" });
   }
 });
+
+/**
+ * Extract PCM data from a WAV buffer
+ * @param {Buffer} waveData - Raw wave file data
+ * @returns {Buffer} - PCM data buffer
+ */
+function extractPCMFromWave(waveData) {
+  // WAV header is typically 44 bytes
+  // Format: http://soundfile.sapp.org/doc/WaveFormat/
+  const headerLength = 44;
+
+  // Extract PCM data (skip WAV header)
+  return waveData.slice(headerLength);
+}
 
 export default lipsyncRouter;
