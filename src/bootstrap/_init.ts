@@ -24,11 +24,11 @@ const createShadowDOM = function() {
   // Create container
   const container = document.createElement('div');
   container.id = apikaContainerId;
-  // container.style.display = 'block';
-  // container.style.position = 'fixed';
-  // container.style.zIndex = '9999';
-  // container.style.bottom = '20px';
-  // container.style.right = '20px';
+  container.style.display = 'block';
+  container.style.position = 'fixed';
+  container.style.zIndex = '99999';
+  container.style.top = '0';
+  container.style.left = '0';
   document.body.appendChild(container);
 
   // Create shadow root
