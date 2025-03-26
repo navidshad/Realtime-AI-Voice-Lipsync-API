@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useState } from "react";
 import { Button } from "./components/shared/Button";
 import { Assistant } from "./components/Assistant";
@@ -7,9 +7,47 @@ import { JotaiProvider } from "./providers/JotaiProvider";
 import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
+import {Config} from "./bootstrap/_init";
+
+// Declare the global apika interface
+declare global {
+  interface Window {
+    apika: {
+      show: () => void;
+      hide: () => void;
+      init: (options: any) => void;
+      open: ((config: Config) => void) | null;
+    };
+  }
+}
 
 export function App() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+
+  //Expose the open function to the global apika object
+  const open = (config: Config) => {
+    console.log('Opening APIKA with config:', config);
+    setIsAssistantOpen(true);
+  };
+
+  const hide = () => {
+    setIsAssistantOpen(false);
+  }
+
+  // Connect to the global apika object
+  useEffect(() => {
+    // Dispatch event with the setter function
+    const event = new CustomEvent('APIKA_READY', {
+      detail: {setIsAssistantOpen}
+    });
+    window.dispatchEvent(event);
+
+    // Allow direct calls from parent window
+    if (window.apika) {
+      window.apika.open = open
+      window.apika.hide = hide
+    }
+  }, []);
 
   return (
     <JotaiProvider>

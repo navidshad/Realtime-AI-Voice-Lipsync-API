@@ -6,13 +6,28 @@ It uses OpenAI API to generate content and provides a user-friendly interface.
 ## Getting started
 
 Install all dependencies with
+
 ```shell
+# Install FE dependencies
 yarn install
+
+# Install BE dependencies
+yarn be:install
+
 ```
 
 Run the local development server with
 ```shell
+# DEV: Run the app in development mode - runs both FE and BE
 yarn dev
+
+# Alternatively, you can run FE and BE separately
+# DEV: Run only the FE in development mode
+yarn fe
+
+# DEV: Run only the BE in development mode
+yarn be
+
 ```
 
 Run tests with
@@ -20,20 +35,43 @@ Run tests with
 yarn test
 ```
 
+Run TypeScript check with
+```shell
+yarn tsc
+```
 
-## Getting started INFRA
+```shell
+yarn build
+```
 
-IMPORTANT: This is just a placeholder for infra. We should set this up next.
+## Running app within Docker containers
 
-This is a starter project for essential infrastructure templates.
-It will help you to get started with the project that is deployed on Cloud Run.
+```shell
 
-Please fork it.
+# DEV: Build the Docker Development image (2 images FE + BE)
+yarn docker:local:build
 
-**Mind that CloudRun expects to serve on the dynamic port number configured by `${PORT}` env variable
-So make sure your app is listening on the `${PORT}`**
+# DEV: Run the Docker Development image
+yarn docker:local:up
 
-When forking please name your project corresponding to CloudRun naming conventions, as the service would be created with the same name:  
-**Service name may only start with a letter and contain up to 49 lowercase letters, numbers or hyphens**
+# PROD: Build the Docker Production image (BE only - serving also bundle dist/public files)
+yarn docker:prod:build
 
-[Loom walkthrough](https://www.loom.com/share/e244b8ed09bc44de9acd86fed5e78ce1)
+# PROD: Run the Docker Production image
+yarn docker:prod:up
+
+# Stop/remove all running containers
+yarn docker:down
+
+```
+
+## GCP Deployment
+
+We have 2 instances running on GCP: 
+- DEV: apika-ai-assistant-dev
+TBD
+- MAIN: apika-ai-assistant-main
+https://apika-ai-assistant-main-3416612702.us-central1.run.app
+
+```shell
+

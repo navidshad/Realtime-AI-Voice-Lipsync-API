@@ -3,7 +3,10 @@
   stage: build
   script:
     - docker pull ${IMAGE_URL}:latest || true
-    - docker build --cache-from ${IMAGE_URL}:latest -t ${IMAGE_URL}:${IMAGE_TAG} -t ${IMAGE_URL}:latest .
+    - docker build --cache-from ${IMAGE_URL}:latest 
+      --build-arg APIKA_APP_URL=${APIKA_APP_URL}
+      -t ${IMAGE_URL}:${IMAGE_TAG} 
+      -t ${IMAGE_URL}:latest .
     - docker push ${IMAGE_URL} --all-tags
 
 build_dev:
