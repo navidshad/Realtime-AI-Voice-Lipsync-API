@@ -180,6 +180,9 @@ export const AiCharacter: React.FC = () => {
         >
           {showChatbox ? "Hide History" : "Show History"}
         </button>
+
+        {/* speak button */}
+        <button onClick={() => avatarRef.current?.speak(3000)}>Speak</button>
       </div>
 
       {/* Chatbox */}

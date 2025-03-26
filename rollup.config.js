@@ -113,7 +113,7 @@ const config = [
     plugins: [
       ...commonPlugins,
       copy({
-        targets: [{ src: "public/index.html", dest: "dist" }],
+        targets: [{ src: "public/*", dest: "dist" }],
       }),
       isDevMode &&
         serve({
