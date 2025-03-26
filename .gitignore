@@ -4,3 +4,4 @@ node_modules
 .idea
 dist
 *.code-workspace
+.DS_Store
