@@ -6,6 +6,7 @@ import cors from "cors";
 import fs from "fs";
 
 import lipsyncRouter from "./lipsinc.js";
+import fetch from "node-fetch";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,14 +29,44 @@ if (!isProduction) {
 const apiRouter = express.Router();
 
 // Move all API endpoints to the router
-apiRouter.get("/get-token", (req, res) => {
-  console.log("Received request for token");
-  const token = process.env.API_TOKEN || "default-token";
-  res.json({
-    token,
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
-  });
+apiRouter.get("/get-token", async (req, res) => {
+  try {
+    const { data } = req.query;
+
+    const additionalSetup = JSON.parse(
+      Buffer.from(data, "base64").toString("utf-8")
+    );
+
+    const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini-realtime-preview",
+        temperature: 0.6,
+        input_audio_transcription: {
+          model: "whisper-1",
+        },
+        ...additionalSetup,
+      }),
+    });
+
+    if (r.status < 200 || r.status >= 299) {
+      const body = await r.json();
+      console.error("Failed to create the live session", body);
+      return res.status(r.status).json({
+        error: `Failed to create the live session, Openai status: ${r.status}`,
+      });
+    }
+
+    const ephemeralToken = await r.json();
+    res.json(ephemeralToken);
+  } catch (error) {
+    console.error("Error generating token:", error);
+    res.status(500).json({ error: "Failed to create the live session" });
+  }
 });
 
 // Mount the API router with /api prefix

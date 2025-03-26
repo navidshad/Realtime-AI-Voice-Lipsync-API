@@ -161,21 +161,18 @@ export function useLiveSessionManager() {
 		}
 
 		const { type, event_id } = eventData;
-
 		if (type === 'session.created') {
 			console.log('Session created', eventData.session);
 			if (onSessionCreatedCallbackRef.current) {
 				onSessionCreatedCallbackRef.current(eventData);
 			}
 		}
-
 		else if (type === 'response.audio_transcript.delta') {
 			const { delta, response_id } = eventData;
 			updateConversationDialogs(delta, response_id, 'ai');
 		}
 		else if (type === 'conversation.item.input_audio_transcription.completed') {
 			const { item_id, transcript } = eventData;
-
 			if (transcript) {
 				updateConversationDialogs(transcript, item_id, 'user');
 				updateLiveSessionRecordOnServer();
@@ -328,7 +325,6 @@ export function useLiveSessionManager() {
 
 		updateConversationDialogs(message, id, 'user');
 	}
-
 	// Update the session config (instructions and tools)
 	const updateSessionConfig = (instructions: string, tools: AiTools) => {
 		if (!dataChannelRef.current) {
@@ -354,12 +350,6 @@ export function useLiveSessionManager() {
 		dataChannelRef.current.send(JSON.stringify(eventObject));
 		triggerConversation('instructions updated');
 	}
-
-	/* End of sending events to the AI */
-
-	/* 
-	 * Utility functions 
-	*/
 
 	const updateConversationDialogs = (content: string, id: string, speaker: 'user' | 'ai') => {
 		setConversationDialogs(prev => {
@@ -486,5 +476,6 @@ export function useLiveSessionManager() {
 		updateSessionConfig,
 		clearConversationDialogs,
 		toggleMicrophone,
+		microphoneTrackRef
 	};
 } 

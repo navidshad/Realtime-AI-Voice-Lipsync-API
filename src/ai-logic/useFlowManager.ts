@@ -27,6 +27,7 @@ export function useFlowManager(config: FlowConfig) {
 		toggleMicrophone,
 		isMicrophoneMuted,
 		sessionStarted,
+		microphoneTrackRef
 	} = useLiveSessionManager();
 
 	const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -204,5 +205,6 @@ export function useFlowManager(config: FlowConfig) {
 		toggleMicrophone,
 		isMicrophoneMuted,
 		sessionStarted,
+		microphoneTrackRef
 	};
 }
