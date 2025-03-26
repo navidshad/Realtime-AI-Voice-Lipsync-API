@@ -315,6 +315,31 @@ export function useLiveSessionManager() {
 
 		updateConversationDialogs(message, id, 'user');
 	}
+	// Update the session config (instructions and tools)
+	const updateSessionConfig = (instructions: string, tools: AiTools) => {
+		if (!dataChannelRef.current) {
+			throw new Error('No data channel available to send message');
+		}
+
+		const eventObject = {
+			"type": "session.update",
+			"session": {}
+		}
+
+		if (instructions) {
+			// @ts-ignore
+			eventObject.session["instructions"] = instructions;
+		}
+
+		if (tools) {
+			// @ts-ignore
+			eventObject.session["tools"] = Object.values(tools).map((t) => t.definition);
+			sessionToolsRef.current = tools;
+		}
+
+		dataChannelRef.current.send(JSON.stringify(eventObject));
+		triggerConversation('instructions updated');
+	}
 
 	// Update the session config (instructions and tools)
 	const updateSessionConfig = (instructions: string, tools: AiTools) => {
@@ -473,6 +498,7 @@ export function useLiveSessionManager() {
 		updateSessionConfig,
 		clearConversationDialogs,
 		toggleMicrophone,
+		updateSessionConfig,
 		microphoneTrackRef
 	};
 } 
