@@ -341,38 +341,6 @@ export function useLiveSessionManager() {
 		triggerConversation('instructions updated');
 	}
 
-	// Update the session config (instructions and tools)
-	const updateSessionConfig = (instructions: string, tools: AiTools) => {
-		if (!dataChannelRef.current) {
-			throw new Error('No data channel available to send message');
-		}
-
-		const eventObject = {
-			"type": "session.update",
-			"session": {}
-		}
-
-		if (instructions) {
-			// @ts-ignore
-			eventObject.session["instructions"] = instructions;
-		}
-
-		if (tools) {
-			// @ts-ignore
-			eventObject.session["tools"] = Object.values(tools).map((t) => t.definition);
-			sessionToolsRef.current = tools;
-		}
-
-		dataChannelRef.current.send(JSON.stringify(eventObject));
-		triggerConversation('instructions updated');
-	}
-
-	/* End of sending events to the AI */
-
-	/* 
-	 * Utility functions 
-	*/
-
 	const updateConversationDialogs = (content: string, id: string, speaker: 'user' | 'ai') => {
 		setConversationDialogs(prev => {
 			const index = prev.findIndex((d) => d.id === id);
@@ -498,7 +466,6 @@ export function useLiveSessionManager() {
 		updateSessionConfig,
 		clearConversationDialogs,
 		toggleMicrophone,
-		updateSessionConfig,
 		microphoneTrackRef
 	};
 } 
