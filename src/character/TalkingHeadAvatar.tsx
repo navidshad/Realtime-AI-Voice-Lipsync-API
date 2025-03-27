@@ -79,6 +79,9 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
             // Store reference for later use
             headRef.current = head;
 
+            // @ts-ignore
+            window.head = head;
+
             // Load the avatar
             await head.showAvatar({
               url: characterUrl,
@@ -137,6 +140,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
           }),
         };
 
+        debugger;
         headRef.current.speakAudio(speakData as any);
       }
     };
@@ -159,24 +163,13 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       // Process words
       words.forEach((word) => {
         audioData.words.push(word.word);
-        audioData.wtimes.push(1000 * word.start - 150); // Adjust timing to match example
+        audioData.wtimes.push(1000 * word.start - 50); // Adjust timing to match example
         audioData.wdurations.push(1000 * (word.end - word.start));
-      });
-
-      // Process segments for markers
-      segments.forEach((segment) => {
-        if (segment.start > 2 && segment.text.length > 10) {
-          // Add a marker for looking at camera and speaking with hands
-          audioData.markers.push(() => {
-            // These actions will be handled by the TalkingHead instance
-            // We just need to provide the timing
-          });
-          audioData.mtimes.push(1000 * segment.start - 1000);
-        }
       });
 
       // Callback function to make the avatar look at the camera
       const startSegment = async () => {
+        console.log("startSegment");
         // @ts-ignore
         headRef.current?.lookAtCamera(500);
         // @ts-ignore

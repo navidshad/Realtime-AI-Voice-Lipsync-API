@@ -23,7 +23,7 @@ const lipsyncRouter = Router();
  * @param {string} outputDir - Directory to save audio files
  * @return {Promise<Object>} Paths to the generated audio files
  */
-async function generateSpeech(text, outputDir) {
+async function generateSpeechFromText(text, outputDir) {
   const wavFile = path.join(outputDir, `${uuidv4()}.wav`);
   const oggFile = path.join(outputDir, `${uuidv4()}.ogg`);
 
@@ -40,12 +40,17 @@ async function generateSpeech(text, outputDir) {
     const buffer = Buffer.from(await waveFile.arrayBuffer());
     await fs.writeFile(wavFile, buffer);
 
+    // write dialog.txt
+    await fs.writeFile("dialog.txt", text);
+
     // Convert WAV to OGG using FFmpeg
     await execFileAsync("ffmpeg", [
       "-i",
       wavFile,
       "-c:a",
       "libvorbis",
+      "-d",
+      "dialog.txt",
       oggFile,
     ]);
 
@@ -142,6 +147,7 @@ function convertToTalkingHeadFormat(rhubarbData, sampleRate) {
     vtimes,
     vdurations,
     totalDurationInMs: duration * 1000,
+    rhubarbData,
   };
 }
 
@@ -157,7 +163,7 @@ lipsyncRouter.get("/generate", async (req, res) => {
     const tempDir = await fs.mkdtemp(path.join("./", "tts-"));
 
     // Step 1: Generate speech and convert to OGG
-    const audioFiles = await generateSpeech(text, tempDir);
+    const audioFiles = await generateSpeechFromText(text, tempDir);
 
     // Step 2: Process with Rhubarb
     const lipSyncData = await processWithRhubarb(
@@ -189,18 +195,6 @@ lipsyncRouter.get("/generate", async (req, res) => {
   }
 });
 
-/**
- * Extract PCM data from a WAV buffer
- * @param {Buffer} waveData - Raw wave file data
- * @returns {Buffer} - PCM data buffer
- */
-function extractPCMFromWave(waveData) {
-  // WAV header is typically 44 bytes
-  // Format: http://soundfile.sapp.org/doc/WaveFormat/
-  const headerLength = 44;
-
-  // Extract PCM data (skip WAV header)
-  return waveData.slice(headerLength);
-}
+lipsyncRouter.get("/generate-from-webm", async (req, res) => {});
 
 export default lipsyncRouter;
