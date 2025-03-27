@@ -1,9 +1,9 @@
 import { ConversationStep } from "../ai-logic/useFlowManager";
 
 const flowDemoSteps: ConversationStep[] = [
-	{
-		label: "Step 1: Initial Assessment",
-		instructions: `
+  {
+    label: "Step 1: Initial Assessment",
+    instructions: `
 			Greet the user warmly and understand their current experience level in IT/DevOps.
 			Ask questions like:
 			- What is your current role or experience in IT?
@@ -15,11 +15,11 @@ const flowDemoSteps: ConversationStep[] = [
 			- Intermediate (some IT experience)
 			- Advanced (experienced in some DevOps practices)
 		`,
-		tools: {},
-	},
-	{
-		label: "Step 2: Learning Path Identification",
-		instructions: `
+    tools: {},
+  },
+  {
+    label: "Step 2: Learning Path Identification",
+    instructions: `
 			Based on the user's experience level, suggest appropriate learning paths.
 			For Beginners:
 			- Start with Linux and Git fundamentals
@@ -40,11 +40,11 @@ const flowDemoSteps: ConversationStep[] = [
 			- How much time can they dedicate weekly?
 			- Do they have any specific certification goals?
 		`,
-		tools: {},
-	},
-	{
-		label: "Step 3: Course Recommendations",
-		instructions: `
+    tools: {},
+  },
+  {
+    label: "Step 3: Course Recommendations",
+    instructions: `
 			Based on the gathered information, recommend specific KodeKloud courses.
 			Include:
 			- Course name and description
@@ -61,11 +61,11 @@ const flowDemoSteps: ConversationStep[] = [
 			
 			Ask if they'd like more details about any specific course.
 		`,
-		tools: {},
-	},
-	{
-		label: "Step 4: Course Details and Enrollment",
-		instructions: `
+    tools: {},
+  },
+  {
+    label: "Step 4: Course Details and Enrollment",
+    instructions: `
 			For the course(s) the user is interested in:
 			- Share detailed course curriculum
 			- Explain the learning platform features
@@ -80,11 +80,11 @@ const flowDemoSteps: ConversationStep[] = [
 			
 			Ask if they have any specific questions about the course or enrollment process.
 		`,
-		tools: {},
-	},
-	{
-		label: "Step 5: Wrap-up and Next Steps",
-		instructions: `
+    tools: {},
+  },
+  {
+    label: "Step 5: Wrap-up and Next Steps",
+    instructions: `
 			Summarize the conversation and the recommended course(s).
 			Provide clear next steps for enrollment.
 			Share contact information for support if needed.
@@ -92,20 +92,24 @@ const flowDemoSteps: ConversationStep[] = [
 			
 			End the conversation with a warm farewell and offer to help with any future questions.
 		`,
-		tools: {
-			finishConversation: {
-				definition: {
-					type: "function",
-					name: "finishConversation",
-					description: "Finish the conversation and provide enrollment next steps",
-				},
-				handler: () => {
-					alert("Thank you for your interest in KodeKloud courses!");
-					return { success: true, message: "Conversation completed successfully" };
-				},
-			},
-		},
-	},
-]
+    tools: {
+      finishConversation: {
+        definition: {
+          type: "function",
+          name: "finishConversation",
+          description:
+            "Finish the conversation and provide enrollment next steps",
+        },
+        handler: () => {
+          alert("Thank you for your interest in KodeKloud courses!");
+          return {
+            success: true,
+            message: "Conversation completed successfully",
+          };
+        },
+      },
+    },
+  },
+];
 
-export default flowDemoSteps;	
+export default flowDemoSteps;

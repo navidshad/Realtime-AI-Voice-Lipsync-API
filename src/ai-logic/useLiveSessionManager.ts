@@ -8,13 +8,14 @@ import {
   isMicrophoneMutedAtom,
   tokenUsageAtom,
 } from "../store/atoms";
-import { requestLiveSessionEphemeralToken } from "./utils";
+import { isAsync, requestLiveSessionEphemeralToken } from "./utils";
 import {
   TokenUsage,
   LiveSession,
   EphemeralToken,
   AiTools,
   AiToolResponse,
+  AiToolHandler,
 } from "./types";
 
 export function useLiveSessionManager() {
@@ -237,6 +238,7 @@ export function useLiveSessionManager() {
     const args = JSON.parse(output01.arguments);
 
     const fn = sessionToolsRef.current[functionName];
+    const fnHandler = fn?.handler as AiToolHandler;
     let fnResponse: AiToolResponse = { success: false };
 
     if (!fn) {
@@ -247,10 +249,12 @@ export function useLiveSessionManager() {
       };
     } else {
       try {
-        if (typeof fn.handler === "function") {
-          fnResponse = fn.handler(args);
+        if (isAsync(fnHandler)) {
+          // @ts-ignore
+          fnResponse = await fnHandler(args);
         } else {
-          fnResponse = await fn.handler(args);
+          // @ts-ignore
+          fnResponse = fnHandler(args);
         }
       } catch (error) {
         console.error("Error calling function", functionName, error);

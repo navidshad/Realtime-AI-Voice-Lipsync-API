@@ -10,6 +10,10 @@ export interface AiToolResponse {
   [key: string]: any;
 }
 
+export type AiToolHandler = (
+  args: any
+) => AiToolResponse | Promise<AiToolResponse>;
+
 export type AiTools = {
   [key: string]: {
     definition: {
@@ -22,7 +26,7 @@ export type AiTools = {
         required: string[];
       };
     };
-    handler: (args: any) => AiToolResponse | Promise<AiToolResponse>;
+    handler: AiToolHandler;
   };
 };
 
