@@ -85,47 +85,6 @@ interface TranscriptionResponse {
   segments: TranscriptionSegment[];
 }
 
-interface AudioDataObject {
-  words: string[];
-  wtimes: number[];
-  wdurations: number[];
-  markers: (() => void)[];
-  mtimes: number[];
-}
-
-function generateLipSyncDataFromTranscription(
-  transcription: TranscriptionResponse
-): AudioDataObject {
-  const audioData: AudioDataObject = {
-    words: [],
-    wtimes: [],
-    wdurations: [],
-    markers: [],
-    mtimes: [],
-  };
-
-  // Process words
-  transcription.words.forEach((word) => {
-    audioData.words.push(word.word);
-    audioData.wtimes.push(1000 * word.start - 150); // Adjust timing to match example
-    audioData.wdurations.push(1000 * (word.end - word.start));
-  });
-
-  // Process segments for markers
-  transcription.segments.forEach((segment) => {
-    if (segment.start > 2 && segment.text.length > 10) {
-      // Add a marker for looking at camera and speaking with hands
-      audioData.markers.push(() => {
-        // These actions will be handled by the TalkingHead instance
-        // We just need to provide the timing
-      });
-      audioData.mtimes.push(1000 * segment.start - 1000);
-    }
-  });
-
-  return audioData;
-}
-
 export async function generateSpeechWithLipSync(options: {
   text?: string;
   webmBlob?: Blob;
@@ -142,13 +101,14 @@ export async function generateSpeechWithLipSync(options: {
     // Step 3: Generate transcription with word timings
     const transcription = await getTranscriptionFromAudio(audioBlob, "mp3");
 
-    // Step 4: Convert transcription to lip sync data
-    const lipSyncData = generateLipSyncDataFromTranscription(transcription);
+    // // Step 4: Convert transcription to lip sync data
+    // const lipSyncData = generateLipSyncDataFromTranscription(transcription);
 
     // Step 5: Return combined audio and lip sync data
     return {
       audio: audioBuffer!,
-      ...lipSyncData,
+      words: transcription.words,
+      segments: transcription.segments,
     };
   } else if (options.webmBlob) {
     const transcription = await getTranscriptionFromAudio(
@@ -156,11 +116,12 @@ export async function generateSpeechWithLipSync(options: {
       "webm"
     );
 
-    const lipSyncData = generateLipSyncDataFromTranscription(transcription);
+    // const lipSyncData = generateLipSyncDataFromTranscription(transcription);
 
     return {
       audio: await options.webmBlob.arrayBuffer(),
-      ...lipSyncData,
+      words: transcription.words,
+      segments: transcription.segments,
     };
   } else {
     throw new Error("No text or webmBlob provided");

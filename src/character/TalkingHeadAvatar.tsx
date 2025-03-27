@@ -1,6 +1,6 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import type { TalkingHead } from "talkinghead";
-import { AudioData } from "./types";
+import { AudioData, SpeakData } from "./types";
 // import { createFakeLipSync } from "./utils";
 
 // Define props interface
@@ -126,14 +126,73 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
 
     const provideLipSyncData = async (lipSyncData: AudioData) => {
       if (headRef.current) {
-        // @ts-ignore
-        lipSyncData.audio = await headRef.current?.audioCtx.decodeAudioData(
-          lipSyncData.audio
-        );
+        const speakData = {
+          // @ts-ignore
+          audio: await headRef.current?.audioCtx.decodeAudioData(
+            lipSyncData.audio
+          ),
+          ...generateLipSyncDataFromTranscription({
+            words: lipSyncData.words,
+            segments: lipSyncData.segments,
+          }),
+        };
 
-        headRef.current.speakAudio(lipSyncData as any);
+        headRef.current.speakAudio(speakData as any);
       }
     };
+
+    function generateLipSyncDataFromTranscription({
+      words,
+      segments,
+    }: {
+      words: any[];
+      segments: any[];
+    }) {
+      const audioData: SpeakData = {
+        words: [],
+        wtimes: [],
+        wdurations: [],
+        markers: [],
+        mtimes: [],
+      };
+
+      // Process words
+      words.forEach((word) => {
+        audioData.words.push(word.word);
+        audioData.wtimes.push(1000 * word.start - 150); // Adjust timing to match example
+        audioData.wdurations.push(1000 * (word.end - word.start));
+      });
+
+      // Process segments for markers
+      segments.forEach((segment) => {
+        if (segment.start > 2 && segment.text.length > 10) {
+          // Add a marker for looking at camera and speaking with hands
+          audioData.markers.push(() => {
+            // These actions will be handled by the TalkingHead instance
+            // We just need to provide the timing
+          });
+          audioData.mtimes.push(1000 * segment.start - 1000);
+        }
+      });
+
+      // Callback function to make the avatar look at the camera
+      const startSegment = async () => {
+        // @ts-ignore
+        headRef.current?.lookAtCamera(500);
+        // @ts-ignore
+        headRef.current?.speakWithHands();
+      };
+
+      // Add timed callback markers to the audio object
+      segments.forEach((x) => {
+        if (x.start > 2 && x.text.length > 10) {
+          audioData.markers.push(startSegment);
+          audioData.mtimes.push(1000 * x.start - 1000);
+        }
+      });
+
+      return audioData;
+    }
 
     // Method to change camera view
     const setView = (view: "full" | "upper" | "mid" | "head") => {
