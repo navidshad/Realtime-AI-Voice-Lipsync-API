@@ -39,8 +39,8 @@ variables:
       # Create server .env if exists
       if [ -f "server/.env.mappings" ]; then
         envsubst < server/.env.mappings > server/.env
-        echo "Server .env contents:"
-        cat server/.env
+        #echo "Server .env contents:"
+        #cat server/.env
       fi
     - |
       echo "=== Docker Info ==="
