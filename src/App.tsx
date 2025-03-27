@@ -75,6 +75,9 @@ export function App() {
                               AI Assistant
                             </Link>
                           </div>
+                          <div className="flex justify-center mt-4">
+                            <FlowSelector />
+                          </div>
                         </nav>
                         <header className="app-header flex flex-col items-center justify-center">
                           <h1 className={"text-blue-500"}>
