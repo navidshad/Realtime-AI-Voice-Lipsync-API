@@ -57,6 +57,7 @@ export const AiCharacter: React.FC = () => {
         );
       },
       onAiSoundStreamed: onAiSoundStreamed,
+      onUpdate: onUpdate,
     });
   }
 
@@ -82,6 +83,8 @@ export const AiCharacter: React.FC = () => {
   async function onUpdate(eventData: any) {
     const { type, response } = eventData;
 
+    // console.log(type, eventData);
+
     // if (type === "response.done") {
     //   const dialoge = response.output[0].content[0].transcript;
     //   const lipSyncData = await generateSpeechWithLipSync({ text: dialoge });
@@ -90,12 +93,7 @@ export const AiCharacter: React.FC = () => {
   }
 
   async function onAiSoundStreamed(webmBlob: Blob, responseId?: string) {
-    // generateOculusLipSyncDataFromServer({ webmBlob }).then((lipSyncData) => {
-    //   console.log("Oculus lipSyncData", lipSyncData);
-    // });
-
     generateSpeechWithLipSync({ webmBlob }).then((lipSyncData) => {
-      // console.log("lipSyncData", lipSyncData);
       avatarRef.current?.provideLipSyncData(lipSyncData as any);
     });
   }

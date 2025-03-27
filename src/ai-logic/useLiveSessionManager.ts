@@ -15,6 +15,7 @@ import {
   AiToolResponse,
   AiToolHandler,
 } from "./types";
+import { CustomMediaRecorder } from "../character/customMediaRecorder";
 
 export function useLiveSessionManager() {
   // State atoms
@@ -44,7 +45,7 @@ export function useLiveSessionManager() {
   const onlyTextRef = useRef<boolean | null>(null);
 
   // Audio Chunks Capture
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const customMediaRecorderRef = useRef<CustomMediaRecorder | null>(null);
   const onAiSoundStreamedRef = useRef<
     ((webmBlob: Blob, responseId?: string) => void) | null
   >(null);
@@ -181,24 +182,13 @@ export function useLiveSessionManager() {
           audioElementRef.current.volume = 0;
         }
 
-        // Create MediaRecorder for WebM recording
-        const mediaRecorder = new MediaRecorder(e.streams[0]);
-
-        mediaRecorderRef.current = mediaRecorder;
-
-        mediaRecorder.ondataavailable = async (event) => {
-          if (event.data.size > 0) {
-            onAiSoundStreamedRef.current?.(event.data);
-
-            // For testing - download the audio
-            // const url = URL.createObjectURL(event.data);
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.download = 'audio.webm';
-            // a.click();
-            // URL.revokeObjectURL(url); // Clean up the URL
+        customMediaRecorderRef.current = new CustomMediaRecorder(
+          e.streams[0],
+          5000,
+          (blob) => {
+            onAiSoundStreamedRef.current?.(blob);
           }
-        };
+        );
       }
     };
 
@@ -256,20 +246,17 @@ export function useLiveSessionManager() {
           audioElementRef.current!.volume = 0;
         }
 
-        mediaRecorderRef.current!.start();
+        customMediaRecorderRef.current!.start();
       } else if (type == "output_audio_buffer.stopped") {
-        mediaRecorderRef.current!.stop();
+        customMediaRecorderRef.current!.stop();
       }
     }
   };
 
   const endLiveSession = () => {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current = null;
+    if (customMediaRecorderRef.current) {
+      customMediaRecorderRef.current.stop();
+      customMediaRecorderRef.current = null;
     }
 
     if (peerConnectionRef.current === null) {

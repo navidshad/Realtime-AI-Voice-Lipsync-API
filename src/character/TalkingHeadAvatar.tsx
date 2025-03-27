@@ -181,7 +181,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       // Process words
       words.forEach((word) => {
         audioData.words.push(word.word);
-        audioData.wtimes.push(1000 * word.start - 50); // Adjust timing to match example
+        audioData.wtimes.push(1000 * word.start - 150); // Adjust timing to match example
         audioData.wdurations.push(1000 * (word.end - word.start));
       });
 
