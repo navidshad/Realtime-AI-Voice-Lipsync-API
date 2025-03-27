@@ -74,7 +74,7 @@ export function useLiveSessionManager() {
       const session = await requestLiveSessionEphemeralToken({
         voice: sessionDetails.voice || "alloy",
         instructions: sessionDetails.instructions,
-        tools: Object.values(tools).map((t) => t.definition),
+        tools: Object.values(tools).filter(t => t !== undefined).map((t) => t.definition),
         tool_choice: "auto",
         turn_detection: {
           type: "server_vad",
@@ -364,9 +364,9 @@ export function useLiveSessionManager() {
 
     if (tools) {
       // @ts-ignore
-      eventObject.session["tools"] = Object.values(tools).map(
-        (t) => t.definition
-      );
+      eventObject.session["tools"] = Object.values(tools)
+        .filter((t) => t !== undefined)
+        .map((t) => t.definition);
       sessionToolsRef.current = tools;
     }
 

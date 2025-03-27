@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { conversationDialogsAtom } from "../../../store/atoms";
 import { ConversationDialog } from "../../../ai-logic/types";
 import { AudioVisualizer } from "../../unit";
+import { SceneManager } from "../../../hooks/useSceneManager";
 
 interface ApikaCard {
     type: "card";
@@ -19,7 +20,8 @@ const ApikaModule: React.FC<{
   toggleMicrophone: () => void;
   isMicrophoneMuted: boolean;
   audioAnalyser: AnalyserNode | null;
-}> = ({ toggleMicrophone, isMicrophoneMuted, audioAnalyser }) => {
+  sceneManager: SceneManager;
+}> = ({ toggleMicrophone, isMicrophoneMuted, audioAnalyser, sceneManager }) => {
   const [conversationDialogs] = useAtom(conversationDialogsAtom);
   const apikaMessage = conversationDialogs
     .slice()
@@ -29,25 +31,12 @@ const ApikaModule: React.FC<{
   const renderMessage = (message: ConversationDialog) => {
     return (
       <div className="w-full space-y-4">
+        {sceneManager.renderScene()}
         <div className="p-6">
           <p className="text-lg text-gray-800 text-center animate-fade-in mx-10 whitespace-pre-wrap">
             {message.content}
           </p>
         </div>
-        {/* 
-        TODO: This is for card content, that we will figure out later
-        <div className="w-full flex flex-wrap gap-4">
-            {message.content.map((card, index) => (
-            <div key={index} className="w-full bg-white rounded-lg border border-gray-200 max-w-sm">
-                <div className="border-b border-gray-200 p-4">
-                <h2 className="text-xl font-semibold text-gray-800">{card.title}</h2>
-                </div>
-                <div className="p-6">
-                <div className="text-gray-700">{card.description}</div>
-                </div>
-            </div>
-            ))}
-        </div> */}
       </div>
     );
   };

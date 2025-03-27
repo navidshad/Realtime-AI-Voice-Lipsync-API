@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { ConversationDialog, TokenUsage, LiveSession } from "../ai-logic/types";
+import { flows } from "../flows";
 
 // Example of a basic atom
 export const countAtom = atom(0);
@@ -52,4 +53,4 @@ export const getConversationDialogsAtom = atom((get) =>
 export const getMicrophoneMutedAtom = atom((get) => get(isMicrophoneMutedAtom));
 
 // Flow selection atom
-export const selectedFlowAtom = atom<string>("flowFreeTestSteps");
+export const selectedFlowAtom = atom<keyof typeof flows>("FlowDemo");

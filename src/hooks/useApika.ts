@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useAudioVisualiser } from "./useAudioVisualiser";
 import { useFlowManager } from "../ai-logic/useFlowManager";
 import { flows } from "../flows";
+import { useSceneManager } from "./useSceneManager";
+import { selectedFlowAtom } from "../store/atoms";
+import { useAtom } from "jotai";
 
 export const useApika = () => {
+  const [currentActiveFlow] = useAtom(selectedFlowAtom);
+  const { setActiveScene, sceneManager } = useSceneManager();
   const {
     initializeFlow,
     endLiveSession,
@@ -11,11 +16,16 @@ export const useApika = () => {
     toggleMicrophone,
     isMicrophoneMuted,
     sessionStarted,
-    microphoneTrackRef
+    microphoneTrackRef,
   } = useFlowManager({
-    steps: flows.flowDemoSteps,
+    steps: flows[currentActiveFlow](setActiveScene),
+    onBeforeStepTransition() {
+        setActiveScene({ 
+            type: "none",
+            data: undefined
+        });
+    },
   });
-
   const initializedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { audioAnalyser } = useAudioVisualiser(microphoneTrackRef);
@@ -40,6 +50,7 @@ export const useApika = () => {
     isMicrophoneMuted,
     sessionStarted,
     audioRef,
-    audioAnalyser
-  }
-}
+    audioAnalyser,
+    sceneManager,
+  };
+};

@@ -14,21 +14,21 @@ export type AiToolHandler = (
   args: any
 ) => AiToolResponse | Promise<AiToolResponse>;
 
-export type AiTools = {
-  [key: string]: {
-    definition: {
-      type: "function";
-      name: string;
-      description: string;
-      parameters?: {
-        type: string;
-        properties: Record<string, any>;
-        required: string[];
-      };
-    };
-    handler: AiToolHandler;
+export type AiToolDefinition = {
+  type: "function";
+  name: string;
+  description: string;
+  parameters?: {
+    type: string;
+    properties: Record<string, any>;
+    required: string[];
   };
 };
+export type AiTool = {
+  definition: AiToolDefinition;
+  handler: AiToolHandler;
+};
+export type AiTools = Partial<Record<string, AiTool>>;
 
 export interface TokenUsage {
   total_tokens: number;

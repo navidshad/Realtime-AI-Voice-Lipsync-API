@@ -12,6 +12,7 @@ export const Assistant = ({ className = "", isReady = false }) => {
     isMicrophoneMuted,
     audioRef,
     audioAnalyser,
+    sceneManager
   } = useApika();
   const [showChatHistory, setShowChatHistory] = useState(false);
 
@@ -29,6 +30,7 @@ export const Assistant = ({ className = "", isReady = false }) => {
             toggleMicrophone={toggleMicrophone}
             isMicrophoneMuted={isMicrophoneMuted}
             audioAnalyser={audioAnalyser}
+            sceneManager={sceneManager}
           />
         </div>
         {!showChatHistory && (

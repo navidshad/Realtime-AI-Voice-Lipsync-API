@@ -3,11 +3,12 @@ import { useAtom } from "jotai";
 import { conversationDialogsAtom, selectedFlowAtom } from "../store/atoms";
 import { useFlowManager } from "../ai-logic/useFlowManager";
 import { flows } from "../flows/index";
+import { useSceneManager } from "../hooks/useSceneManager";
 
 export const AiFlow: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [selectedFlow] = useAtom(selectedFlowAtom);
-
+  const { setActiveScene } = useSceneManager();
   const {
     initializeFlow,
     endLiveSession,
@@ -16,7 +17,7 @@ export const AiFlow: React.FC = () => {
     isMicrophoneMuted,
     sessionStarted,
   } = useFlowManager({
-    steps: flows[selectedFlow],
+    steps: flows[selectedFlow](setActiveScene),
     onBeforeStepTransition: async (step) => {
       console.log("onBeforeStepTransition async", step);
       return Promise.resolve();

@@ -1,6 +1,6 @@
-import { ConversationStep } from "../ai-logic/useFlowManager";
+import { Flow } from "./types";
 
-const flowDemoSteps: ConversationStep[] = [
+const flowDemoSteps: Flow = () => [
   {
     label: "Step 1: Initial Assessment",
     instructions: `
@@ -15,10 +15,9 @@ const flowDemoSteps: ConversationStep[] = [
 			- Intermediate (some IT experience)
 			- Advanced (experienced in some DevOps practices)
 		`,
-    tools: {},
   },
   {
-    label: "Step 2: Learning Path Identification",
+    label: "Step 2: Learning Path Identification", 
     instructions: `
 			Based on the user's experience level, suggest appropriate learning paths.
 			For Beginners:
@@ -40,7 +39,6 @@ const flowDemoSteps: ConversationStep[] = [
 			- How much time can they dedicate weekly?
 			- Do they have any specific certification goals?
 		`,
-    tools: {},
   },
   {
     label: "Step 3: Course Recommendations",
@@ -61,7 +59,6 @@ const flowDemoSteps: ConversationStep[] = [
 			
 			Ask if they'd like more details about any specific course.
 		`,
-    tools: {},
   },
   {
     label: "Step 4: Course Details and Enrollment",
@@ -80,7 +77,6 @@ const flowDemoSteps: ConversationStep[] = [
 			
 			Ask if they have any specific questions about the course or enrollment process.
 		`,
-    tools: {},
   },
   {
     label: "Step 5: Wrap-up and Next Steps",

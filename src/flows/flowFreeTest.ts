@@ -1,6 +1,6 @@
-import { ConversationStep } from "../ai-logic/useFlowManager";
+import { Flow } from "./types";
 
-const flowDemoSteps: ConversationStep[] = [
+const FlowFreeTest: Flow = () =>  [
   {
     label: "Step 1: Function testing",
     instructions: `
@@ -73,4 +73,4 @@ const flowDemoSteps: ConversationStep[] = [
   },
 ];
 
-export default flowDemoSteps;
+export default FlowFreeTest;

@@ -1,9 +1,10 @@
-import { ConversationStep } from "../ai-logic/useFlowManager";
+import { Flow } from "./types";
+import FlowDemo from "./FlowDemo";
+import FlowHimanshu from "./FlowHimanshu";
+import FlowFreeTest from "./FlowFreeTest";
 
-import flowDemoSteps from "./FlowDemo";
-import flowFreeTestSteps from "./flowFreeTest";
-
-export const flows: { [key: string]: ConversationStep[] } = {
-  flowDemoSteps: flowDemoSteps,
-  flowFreeTestSteps: flowFreeTestSteps,
+export const flows: { [key: string]: Flow } = {
+  FlowDemo,
+  FlowHimanshu,
+  FlowFreeTest,
 };
