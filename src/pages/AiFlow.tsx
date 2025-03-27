@@ -4,7 +4,7 @@ import { conversationDialogsAtom } from "../store/atoms";
 import { useFlowManager } from "../ai-logic/useFlowManager";
 import { flows } from "../flows/index";
 
-export const AiAssistantFlow01: React.FC = () => {
+export const AiFlow: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const {
