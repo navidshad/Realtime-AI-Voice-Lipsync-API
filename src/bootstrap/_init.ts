@@ -179,5 +179,6 @@ const apika = {
       });
   }
 };
+sendEvent(ApikaEvent.APIKA_INIT_LOADED);
 // @ts-ignore
 window.apika = apika;

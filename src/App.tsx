@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {Button} from "./components/shared/Button";
 import {Assistant} from "./components/Assistant";
 import {twMerge} from "tailwind-merge";
@@ -10,23 +10,15 @@ import {AiAssistantFlow01} from "./pages/AiAssistanFlow01";
 import {useApikaInitializer} from "./hooks/useApikaInitializer";
 import {useAtom} from "jotai";
 import {configurationAtom} from "./store/atoms";
-import {useDraggableButton} from "./hooks/useDraggableButton";
+import {MainButton} from "./components/shared/MainButton";
 
 export function App() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
-  
   useApikaInitializer(setIsAssistantOpen);
 
   const [config] = useAtom(configurationAtom);
   const {devMode} = config;
-  const {
-    position,
-    isDragging,
-    hasMoved,
-    handleMouseDown,
-    setHasMoved
-  } = useDraggableButton()
 
   return (
     <JotaiProvider>
@@ -80,42 +72,22 @@ export function App() {
                         </header>
                       </div>
                     ):(
-                      <div
-                        className="fixed pointer-events-auto z-50"
-                        style={{ 
-                          left: `${position.x}px`, 
-                          top: `${position.y}px`,
-                          cursor: isDragging ? 'grabbing' : 'pointer'
-                        }}
-                        onMouseDown={handleMouseDown}
-                      >
-                        <Button
-                          className={`flex items-center justify-center w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12 hover:shadow-xl ${!isAssistantOpen ? 'opacity-100' : 'opacity-0'}`}
-                          onClick={(e) => {
-                            if (!hasMoved) {
-                              setIsAssistantOpen(true);
-                            }
-                            setHasMoved(false);
-                          }}
-                          title="Start Apika Assistant (Drag to move)"
-                        >
-                          <div className="flex items-center">
-                            <span className="font-bold text-lg mr-1">A</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                            </svg>
-                          </div>
-                        </Button>
-                      </div>
+                      <MainButton
+                        isAssistantOpen={isAssistantOpen}
+                        setIsAssistantOpen={setIsAssistantOpen}
+                      />
                     )}
                     {isAssistantOpen && (
                       <div
                         className={twMerge(
-                          "transition-opacity duration-300",
+                          "transition-opacity duration-300 pointer-events-auto",
                           "opacity-100"
                         )}
                       >
-                        <Assistant className="opacity-100"/>
+                        <Assistant
+                          className="opacity-100"
+                          onClose={() => setIsAssistantOpen(false)}
+                        />
                       </div>
                     )}
                   </div>
