@@ -3,8 +3,8 @@ export class CustomMediaRecorder {
   private recorder2: MediaRecorder | null = null;
   private activeRecorder: 1 | 2 = 1;
   private isRecording: boolean = false;
-  private switchTimeout: NodeJS.Timeout | null = null;
-  private nextSwitchTimeout: NodeJS.Timeout | null = null;
+  private switchInterval: NodeJS.Timer | null = null;
+  private switchTimeout: any | null = null;
 
   constructor(
     private stream: MediaStream,
@@ -24,24 +24,16 @@ export class CustomMediaRecorder {
         mimeType: "audio/webm;codecs=opus",
       });
 
-      // Setup event handlers
+      // Setup event handlers - now they only handle the data
       this.recorder1.ondataavailable = (event) => {
         if (event.data.size > 0) {
           this.onDataAvailable(event.data);
-          // Only switch if we're still recording
-          if (this.isRecording) {
-            this.switchToRecorder(2);
-          }
         }
       };
 
       this.recorder2.ondataavailable = (event) => {
         if (event.data.size > 0) {
           this.onDataAvailable(event.data);
-          // Only switch if we're still recording
-          if (this.isRecording) {
-            this.switchToRecorder(1);
-          }
         }
       };
     } catch (error) {
@@ -57,31 +49,15 @@ export class CustomMediaRecorder {
     if (!currentRecorder || !otherRecorder) return;
 
     try {
-      // Clear any pending timeouts
-      if (this.switchTimeout) {
-        clearTimeout(this.switchTimeout);
-      }
-      if (this.nextSwitchTimeout) {
-        clearTimeout(this.nextSwitchTimeout);
-      }
-
       // Start the new recorder with timeslice parameter
       currentRecorder.start(this.duration);
       this.activeRecorder = number;
 
       // Stop the previous recorder with a small overlap
-      this.switchTimeout = setTimeout(() => {
-        if (this.isRecording && otherRecorder.state === "recording") {
-          otherRecorder.stop();
-        }
-      }, 200); // Increased overlap period
 
-      // Schedule the next switch
-      this.nextSwitchTimeout = setTimeout(() => {
-        if (this.isRecording && currentRecorder.state === "recording") {
-          currentRecorder.stop();
-        }
-      }, Math.max(this.duration - 100, 1000)); // Ensure minimum duration of 1 second
+      if (this.isRecording && otherRecorder.state === "recording") {
+        otherRecorder.stop();
+      }
     } catch (error) {
       console.error("Error switching recorders:", error);
     }
@@ -90,19 +66,28 @@ export class CustomMediaRecorder {
   start() {
     this.isRecording = true;
     this.switchToRecorder(1);
+
+    // Set up the interval for switching recorders
+    this.switchInterval = setInterval(() => {
+      if (this.isRecording) {
+        this.switchToRecorder(this.activeRecorder === 1 ? 2 : 1);
+      }
+    }, this.duration - 100); // Switch slightly before the duration ends
   }
 
   stop() {
     this.isRecording = false;
 
+    // Clear the switch interval
+    if (this.switchInterval) {
+      clearInterval(this.switchInterval as NodeJS.Timeout);
+      this.switchInterval = null;
+    }
+
+    // Clear any pending switch timeout
     if (this.switchTimeout) {
       clearTimeout(this.switchTimeout);
       this.switchTimeout = null;
-    }
-
-    if (this.nextSwitchTimeout) {
-      clearTimeout(this.nextSwitchTimeout);
-      this.nextSwitchTimeout = null;
     }
 
     // Stop both recorders

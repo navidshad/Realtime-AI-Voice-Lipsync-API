@@ -33,7 +33,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
     {
       characterUrl,
       bodyType = "M",
-      initialView = "upper",
+      initialView = "mid",
       initialMood = "neutral",
       height = "100%",
       width = "100%",
@@ -187,7 +187,6 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
 
       // Callback function to make the avatar look at the camera
       const startSegment = async () => {
-        console.log("startSegment");
         // @ts-ignore
         headRef.current?.lookAtCamera(500);
         // @ts-ignore

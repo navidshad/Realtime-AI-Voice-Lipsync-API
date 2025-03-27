@@ -44,8 +44,9 @@ export const AiCharacter: React.FC = () => {
   function initializeLiveSession() {
     createLiveSession({
       sessionDetails: {
+        voice: "shimmer",
         instructions:
-          "You are a helpful AI assistant. Help the user with their questions.",
+          "You are a helpful AI assistant. Help the user with their questions. use facial expressions and emojies in your responses to make it more engaging",
         onlyText: true,
         turnDetectionSilenceDuration: 1000,
       },
@@ -324,7 +325,7 @@ export const AiCharacter: React.FC = () => {
 
       <TalkingHeadAvatar
         ref={avatarRef}
-        characterUrl="/models/634c5abfd5dcded8a45e70e0.glb"
+        characterUrl="/models/brunette.glb"
         bodyType="M"
         initialMood="neutral"
         lipsyncLang="en"

@@ -45,6 +45,7 @@ export function useLiveSessionManager() {
   const onlyTextRef = useRef<boolean | null>(null);
 
   // Audio Chunks Capture
+  const durationPart = 2000;
   const customMediaRecorderRef = useRef<CustomMediaRecorder | null>(null);
   const onAiSoundStreamedRef = useRef<
     ((webmBlob: Blob, responseId?: string) => void) | null
@@ -184,7 +185,7 @@ export function useLiveSessionManager() {
 
         customMediaRecorderRef.current = new CustomMediaRecorder(
           e.streams[0],
-          5000,
+          durationPart,
           (blob) => {
             onAiSoundStreamedRef.current?.(blob);
           }

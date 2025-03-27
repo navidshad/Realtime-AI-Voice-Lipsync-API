@@ -73,7 +73,7 @@ async function getTranscriptionFromAudio(
   form.append("response_format", "verbose_json");
   form.append(
     "prompt",
-    "[The following is a full verbatim transcription without additional details, comments or emojis:]"
+    "Add facial expressions and emojies to the transcription"
   );
   form.append("timestamp_granularities[]", "word");
   form.append("timestamp_granularities[]", "segment");
