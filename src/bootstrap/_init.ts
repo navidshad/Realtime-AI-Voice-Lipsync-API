@@ -1,16 +1,36 @@
 import {APIKA_SERVICE_URL, isLocalhost} from "../constants";
-
-export type Config = {
-  autoShow: boolean;
-}
+import {registerEventListener} from "../events/register-event-listener";
+import {ApikaEvent} from "../events/events.types";
+import {sendEvent} from "../events/send-event";
+import {Config, defaultConfig} from "../constants";
 
 let isLoaded = false;
-let config: Config = {
-  autoShow: true,
-};
+let isInitialized = false;
+
+let config: Config = {} as Config
 
 let shadowRoot: ShadowRoot | null = null;
-let appLoaded = false;
+
+// Parse URL parameters to override config
+const parseUrlParams = (): Partial<Config> => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const configOverrides: Record<string, any> = {};
+  
+  // Convert kebab-case URL params to camelCase config props
+  Array.from(urlParams.entries()).forEach(([key, value]) => {
+    if (key.startsWith('apika-')) {
+      const configKey = key.replace('apika-', '').replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      
+      // Convert string values to proper types
+      if (value === 'true') configOverrides[configKey] = true;
+      else if (value === 'false') configOverrides[configKey] = false;
+      else if (!isNaN(Number(value))) configOverrides[configKey] = Number(value);
+      else configOverrides[configKey] = value;
+    }
+  });
+  
+  return configOverrides as Partial<Config>;
+};
 
 // Create and mount the Shadow DOM structure
 const createShadowDOM = function() {
@@ -29,6 +49,7 @@ const createShadowDOM = function() {
   container.style.zIndex = '99999';
   container.style.top = '0';
   container.style.left = '0';
+  container.style.pointerEvents = 'none';
   document.body.appendChild(container);
 
   // Create shadow root
@@ -110,18 +131,36 @@ const loadScript = function() {
 };
 
 const prepareConfig = function(userConfig = {}) {
+  const urlParamOverrides = parseUrlParams();
+  
   config = {
-    ...config,
-    ...userConfig ?? {}
+    ...defaultConfig,
+    ...userConfig ?? {},
+    ...urlParamOverrides // URL params take highest precedence
   } as Config;
+  
+  console.log('Config prepared with URL overrides:', config);
 };
 
 const apika = {
-  open: (config: Config) => {},
+  open: () => {
+    sendEvent(ApikaEvent.APIKA_OPEN, config);
+  },
+  close: () => {
+    sendEvent(ApikaEvent.APIKA_CLOSE);
+  },
   init: function(userConfig: Config) {
-    if (isLoaded) {
+    if (isInitialized) {
       return;
     }
+    isInitialized = true
+
+    console.log('registering...')
+
+    registerEventListener(ApikaEvent.APIKA_READY, () => {
+      console.log('event listener callback')
+      sendEvent(ApikaEvent.APIKA_INIT, config);
+    });
     
     prepareConfig(userConfig);
     
@@ -131,28 +170,13 @@ const apika = {
     loadCustomStyles()
       .then(() => loadScript())
       .then(() => {
+        console.log('is loaded yes')
         isLoaded = true;
-        if (config.autoShow) {
-          this.show();
-        }
+
       })
       .catch(error => {
         console.error('Failed to initialize Apika', error);
       });
-  },
-  
-  show: function() {
-    if (shadowRoot?.host instanceof HTMLElement) {
-      console.log('showing');
-      apika.open(config)
-      shadowRoot.host.style.display = 'block';
-    }
-  },
-  
-  hide: function() {
-    if (shadowRoot?.host instanceof HTMLElement) {
-      shadowRoot.host.style.display = 'none';
-    }
   }
 };
 // @ts-ignore

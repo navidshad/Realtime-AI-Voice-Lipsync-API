@@ -1,5 +1,10 @@
 import { atom } from "jotai";
 import { ConversationDialog, TokenUsage, LiveSession } from "../ai-logic/types";
+import {Config, defaultConfig} from "../constants";
+
+export const configurationAtom = atom({
+  ...defaultConfig
+} as Config)
 
 // Example of a basic atom
 export const countAtom = atom(0);
