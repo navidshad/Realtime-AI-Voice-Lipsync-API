@@ -1,4 +1,31 @@
-import { AudioData, AudioDataResponse } from "./types";
+import { AudioData, AudioDataResponse, TranscriptionResponse } from "./types";
+
+export async function generateOculusLipSyncDataFromServer(options: {
+  text?: string;
+  webmBlob?: Blob;
+}): Promise<any> {
+  console.log("generateOculusLipSyncDataFromServer");
+
+  const url = "http://localhost:8080/lipsinc/generate-from-file";
+
+  const form = new FormData();
+  form.append("audio", options.webmBlob!);
+
+  if (options.text) {
+    form.append("text", options.text);
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    body: form,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to generate lip sync data: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
 
 export async function generateLipSyncDataFromServer(text: string) {
   console.log("generateLipSyncDataFromServer");
@@ -67,22 +94,6 @@ async function getTranscriptionFromAudio(
   }
 
   return await response.json();
-}
-
-interface TranscriptionWord {
-  word: string;
-  start: number;
-  end: number;
-}
-
-interface TranscriptionSegment {
-  start: number;
-  text: string;
-}
-
-interface TranscriptionResponse {
-  words: TranscriptionWord[];
-  segments: TranscriptionSegment[];
 }
 
 export async function generateSpeechWithLipSync(options: {

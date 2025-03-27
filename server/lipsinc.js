@@ -71,17 +71,21 @@ async function generateSpeechFromText(text, outputDir) {
  * @param {Object} options - Rhubarb configuration options
  * @return {Promise<Object>} Processed lip sync data
  */
-async function processWithRhubarb(audioFile, outputDir, options = {}) {
+async function processWithRhubarb(audioFile, outputDir, text, options = {}) {
   const outputFile = path.join(outputDir, "output.json");
 
   try {
     // Process with Rhubarb
     const args = [audioFile, "-o", outputFile, "-f", "json"];
 
-    // Add extended shapes if specified
-    if (options.extendedShapes) {
-      args.push("--extendedShapes", options.extendedShapes);
+    if (text) {
+      const dialogFile = path.join(outputDir, "dialog.txt");
+      await fs.writeFile(dialogFile, text);
+      args.push("-d", dialogFile);
     }
+
+    // Add extended shapes if specified
+    args.push("--extendedShapes", options.extendedShapes || "");
 
     // Run Rhubarb
     await execFileAsync(options.rhubarbPath || "rhubarb", args);
@@ -152,6 +156,8 @@ function convertToTalkingHeadFormat(rhubarbData, sampleRate) {
 }
 
 lipsyncRouter.get("/generate", async (req, res) => {
+  let tempDir = "temp";
+
   try {
     const { text, options } = req.query;
 
@@ -160,7 +166,7 @@ lipsyncRouter.get("/generate", async (req, res) => {
     }
 
     // Create temporary directory for this request
-    const tempDir = await fs.mkdtemp(path.join("./", "tts-"));
+    tempDir = await fs.mkdtemp(path.join("./", "tts-"));
 
     // Step 1: Generate speech and convert to OGG
     const audioFiles = await generateSpeechFromText(text, tempDir);
@@ -169,6 +175,7 @@ lipsyncRouter.get("/generate", async (req, res) => {
     const lipSyncData = await processWithRhubarb(
       audioFiles.oggFile,
       tempDir,
+      text,
       options
     );
 
@@ -189,12 +196,77 @@ lipsyncRouter.get("/generate", async (req, res) => {
         data: base64Data,
       },
     });
+
+    await fs.rm(tempDir, { recursive: true, force: true });
   } catch (error) {
+    await fs.rm(tempDir, { recursive: true, force: true });
     console.error("Error in generate endpoint:", error);
     res.status(500).json({ error: "Failed to process text to lip sync" });
   }
 });
 
-lipsyncRouter.get("/generate-from-webm", async (req, res) => {});
+lipsyncRouter.post("/generate-from-file", async (req, res) => {
+  let tempDir = "temp";
+
+  try {
+    // Get the audio file from the request
+    if (!req.files || !req.files.audio) {
+      return res.status(400).json({ error: "Audio file is required" });
+    }
+
+    // Create temporary directory for this request
+    tempDir = await fs.mkdtemp(path.join("./", "audio-"));
+
+    const audioFile = req.files.audio;
+    const inputAudioPath = path.join(tempDir, "input.webm");
+
+    // Move the uploaded file to our temp directory
+    await audioFile.mv(inputAudioPath);
+
+    // Convert WebM to OGG using FFmpeg
+    const oggFile = path.join(tempDir, "output.ogg");
+    await execFileAsync("ffmpeg", [
+      "-i",
+      inputAudioPath,
+      "-c:a",
+      "libvorbis",
+      oggFile,
+    ]);
+
+    // Process with Rhubarb
+    const lipSyncData = await processWithRhubarb(
+      oggFile,
+      tempDir,
+      req.body?.text || null,
+      req.query.options
+    );
+
+    // Convert the original audio to WAV for consistency
+    const wavFile = path.join(tempDir, "output.wav");
+    await execFileAsync("ffmpeg", [
+      "-i",
+      inputAudioPath,
+      "-acodec",
+      "pcm_s16le",
+      "-ar",
+      "22050",
+      wavFile,
+    ]);
+
+    // Send response with both lip sync data and audio
+    res.json(lipSyncData);
+
+    // Clean up temporary files
+    await fs.rm(tempDir, { recursive: true, force: true });
+  } catch (error) {
+    // Clean up temporary files
+    await fs.rm(tempDir, { recursive: true, force: true });
+
+    console.error("Error in generate-from-webm endpoint:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to process audio file for lip sync" });
+  }
+});
 
 export default lipsyncRouter;

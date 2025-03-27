@@ -20,6 +20,7 @@ interface TalkingHeadProps {
 export interface TalkingHeadRef {
   speak: (duration?: number) => void;
   provideLipSyncData: (lipSyncData: AudioData) => void;
+  provideOculusLipSyncData: (lipSyncData: AudioData) => void;
   setView: (view: "full" | "upper" | "mid" | "head") => void;
   setMood: (mood: string) => void;
   playGesture: (gesture: string, duration?: number, mirror?: boolean) => void;
@@ -45,6 +46,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
     const avatarRef = useRef<HTMLDivElement>(null);
     const headRef = useRef<TalkingHead | null>(null);
     const initializedRef = useRef(false);
+
     // Initialize TalkingHead on component mount
     useEffect(() => {
       if (initializedRef.current) return;
@@ -140,7 +142,23 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
           }),
         };
 
-        debugger;
+        headRef.current.speakAudio(speakData as any);
+      }
+    };
+
+    const provideOculusLipSyncData = async (lipSyncData: AudioData) => {
+      if (headRef.current) {
+        const speakData = {
+          // @ts-ignore
+          audio: await headRef.current?.audioCtx.decodeAudioData(
+            lipSyncData.audio
+          ),
+          ...generateLipSyncDataFromTranscription({
+            words: lipSyncData.words,
+            segments: lipSyncData.segments,
+          }),
+        };
+
         headRef.current.speakAudio(speakData as any);
       }
     };
@@ -214,6 +232,7 @@ const TalkingHeadAvatar = forwardRef<TalkingHeadRef, TalkingHeadProps>(
       () => ({
         speak,
         provideLipSyncData,
+        provideOculusLipSyncData,
         setView,
         setMood,
         playGesture,

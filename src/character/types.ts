@@ -6,10 +6,26 @@ export interface AudioDataResponse {
   totalDurationInMs: number;
 }
 
+interface TranscriptionWord {
+  word: string;
+  start: number;
+  end: number;
+}
+
+interface TranscriptionSegment {
+  start: number;
+  text: string;
+}
+
+export interface TranscriptionResponse {
+  words: TranscriptionWord[];
+  segments: TranscriptionSegment[];
+}
+
 export interface AudioData {
   audio: ArrayBuffer;
-  words: any[];
-  segments: any[];
+  words: TranscriptionWord[];
+  segments: TranscriptionSegment[];
   [key: string]: any;
 }
 

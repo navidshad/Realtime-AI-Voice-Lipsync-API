@@ -5,7 +5,10 @@ import { conversationDialogsAtom } from "../store/atoms";
 import TalkingHeadAvatar, {
   TalkingHeadRef,
 } from "../character/TalkingHeadAvatar";
-import { generateSpeechWithLipSync } from "../character/utils";
+import {
+  generateOculusLipSyncDataFromServer,
+  generateSpeechWithLipSync,
+} from "../character/utils";
 
 export const AiCharacter: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -87,8 +90,14 @@ export const AiCharacter: React.FC = () => {
   }
 
   async function onAiSoundStreamed(webmBlob: Blob, responseId?: string) {
-    const lipSyncData = await generateSpeechWithLipSync({ webmBlob });
-    avatarRef.current?.provideLipSyncData(lipSyncData as any);
+    // generateOculusLipSyncDataFromServer({ webmBlob }).then((lipSyncData) => {
+    //   console.log("Oculus lipSyncData", lipSyncData);
+    // });
+
+    generateSpeechWithLipSync({ webmBlob }).then((lipSyncData) => {
+      // console.log("lipSyncData", lipSyncData);
+      avatarRef.current?.provideLipSyncData(lipSyncData as any);
+    });
   }
 
   // Get the last AI dialog
