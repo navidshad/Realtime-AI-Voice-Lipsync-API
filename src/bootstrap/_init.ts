@@ -1,14 +1,36 @@
-export type Config = {
-  autoShow: boolean;
-}
+import {APIKA_SERVICE_URL, isLocalhost} from "../constants";
+import {registerEventListener} from "../events/register-event-listener";
+import {ApikaEvent} from "../events/events.types";
+import {sendEvent} from "../events/send-event";
+import {Config, defaultConfig} from "../constants";
 
 let isLoaded = false;
-let config: Config = {
-  autoShow: true,
-};
+let isInitialized = false;
+
+let config: Config = {} as Config
 
 let shadowRoot: ShadowRoot | null = null;
-let appLoaded = false;
+
+// Parse URL parameters to override config
+const parseUrlParams = (): Partial<Config> => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const configOverrides: Record<string, any> = {};
+  
+  // Convert kebab-case URL params to camelCase config props
+  Array.from(urlParams.entries()).forEach(([key, value]) => {
+    if (key.startsWith('apika-')) {
+      const configKey = key.replace('apika-', '').replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      
+      // Convert string values to proper types
+      if (value === 'true') configOverrides[configKey] = true;
+      else if (value === 'false') configOverrides[configKey] = false;
+      else if (!isNaN(Number(value))) configOverrides[configKey] = Number(value);
+      else configOverrides[configKey] = value;
+    }
+  });
+  
+  return configOverrides as Partial<Config>;
+};
 
 // Create and mount the Shadow DOM structure
 const createShadowDOM = function() {
@@ -22,11 +44,12 @@ const createShadowDOM = function() {
   // Create container
   const container = document.createElement('div');
   container.id = apikaContainerId;
-  // container.style.display = 'block';
-  // container.style.position = 'fixed';
-  // container.style.zIndex = '9999';
-  // container.style.bottom = '20px';
-  // container.style.right = '20px';
+  container.style.display = 'block';
+  container.style.position = 'fixed';
+  container.style.zIndex = '99999';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.pointerEvents = 'none';
   document.body.appendChild(container);
 
   // Create shadow root
@@ -81,7 +104,7 @@ const createShadowDOM = function() {
 const loadCustomStyles = function() {
   if (!shadowRoot) return Promise.reject('Shadow DOM not initialized');
   
-  return fetch(`/apika.css?v=${Date.now()}`)
+  return fetch( `${isLocalhost ? "" : APIKA_SERVICE_URL}/apika.css?v=${Date.now()}`)
     .then(response => {
       if (!response.ok) throw new Error('Failed to load custom CSS');
       return response.text();
@@ -100,7 +123,7 @@ const loadCustomStyles = function() {
 const loadScript = function() {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `/apika.js?v=${Date.now()}`;
+    script.src = `${isLocalhost ? "" : APIKA_SERVICE_URL}/apika.js?v=${Date.now()}`;
     script.onload = () => resolve(true);
     script.onerror = () => reject('Failed to load app script');
     document.head.appendChild(script);
@@ -108,18 +131,36 @@ const loadScript = function() {
 };
 
 const prepareConfig = function(userConfig = {}) {
+  const urlParamOverrides = parseUrlParams();
+  
   config = {
-    ...config,
-    ...userConfig ?? {}
+    ...defaultConfig,
+    ...userConfig ?? {},
+    ...urlParamOverrides // URL params take highest precedence
   } as Config;
+  
+  console.log('Config prepared with URL overrides:', config);
 };
 
 const apika = {
-  open: (config: Config) => {},
+  open: () => {
+    sendEvent(ApikaEvent.APIKA_OPEN, config);
+  },
+  close: () => {
+    sendEvent(ApikaEvent.APIKA_CLOSE);
+  },
   init: function(userConfig: Config) {
-    if (isLoaded) {
+    if (isInitialized) {
       return;
     }
+    isInitialized = true
+
+    console.log('registering...')
+
+    registerEventListener(ApikaEvent.APIKA_READY, () => {
+      console.log('event listener callback')
+      sendEvent(ApikaEvent.APIKA_INIT, config);
+    });
     
     prepareConfig(userConfig);
     
@@ -129,29 +170,15 @@ const apika = {
     loadCustomStyles()
       .then(() => loadScript())
       .then(() => {
+        console.log('is loaded yes')
         isLoaded = true;
-        if (config.autoShow) {
-          this.show();
-        }
+
       })
       .catch(error => {
         console.error('Failed to initialize Apika', error);
       });
-  },
-  
-  show: function() {
-    if (shadowRoot?.host instanceof HTMLElement) {
-      console.log('showing');
-      apika.open(config)
-      shadowRoot.host.style.display = 'block';
-    }
-  },
-  
-  hide: function() {
-    if (shadowRoot?.host instanceof HTMLElement) {
-      shadowRoot.host.style.display = 'none';
-    }
   }
 };
+sendEvent(ApikaEvent.APIKA_INIT_LOADED);
 // @ts-ignore
 window.apika = apika;
