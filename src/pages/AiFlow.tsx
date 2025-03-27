@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { conversationDialogsAtom } from "../store/atoms";
+import { conversationDialogsAtom, selectedFlowAtom } from "../store/atoms";
 import { useFlowManager } from "../ai-logic/useFlowManager";
+import { flows } from "../flows/index";
+import { useSceneManager } from "../hooks/useSceneManager";
 
-export const AiAssistantFlow01: React.FC = () => {
+export const AiFlow: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
-
+  const [selectedFlow] = useAtom(selectedFlowAtom);
+  const { setActiveScene } = useSceneManager();
   const {
     initializeFlow,
     endLiveSession,
@@ -14,40 +17,11 @@ export const AiAssistantFlow01: React.FC = () => {
     isMicrophoneMuted,
     sessionStarted,
   } = useFlowManager({
-    steps: [
-      {
-        label: "Step 1",
-        instructions:
-          "Help the user to select a city from all the cities in the world. dont talk about detail in this step, just ask the user to select a city.",
-        tools: {},
-      },
-      {
-        label: "Step 2",
-        instructions: `
-        Goal: Now let's talk about the selected city.
-        Instructions: Talk about the selected city in detail.
-        Finish signal: if user shows he or she got the enough information about the city.
-        `,
-        tools: {},
-      },
-      {
-        label: "Step 3",
-        instructions: "Finish the conversation, and say goodbye",
-        tools: {
-          finishConversation: {
-            definition: {
-              type: "function",
-              name: "finishConversation",
-              description: "Finish the conversation, and say goodbye",
-            },
-            handler: () => {
-              alert("Conversation finished");
-              return { success: true, message: "Conversation finished" };
-            },
-          },
-        },
-      },
-    ],
+    steps: flows[selectedFlow](setActiveScene),
+    onBeforeStepTransition: async (step) => {
+      console.log("onBeforeStepTransition async", step);
+      return Promise.resolve();
+    },
   });
 
   const [conversationDialogs] = useAtom(conversationDialogsAtom);
@@ -68,7 +42,7 @@ export const AiAssistantFlow01: React.FC = () => {
   }, []);
 
   const onUpdate = (eventData: any) => {
-    console.log("onUpdate", eventData);
+    // console.log("onUpdate", eventData);
   };
 
   const handleChatboxToggle = () => {

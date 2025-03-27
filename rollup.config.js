@@ -77,10 +77,13 @@ const commonPlugins = [
     "process.env.GET_SESSION_DATA_URL": JSON.stringify(
       process.env.GET_SESSION_DATA_URL
     ),
-    "process.env.APIKA_APP_URL": isDevMode
-      ? JSON.stringify(process.env.APIKA_APP_URL)
-      : "",
+
+    //In dev mode we have both FE and BE, but in build mode we have just 1 instance app url (based on BE)
+    "process.env.APIKA_SERVICE_URL": isDevMode
+      ? JSON.stringify(process.env.APIKA_SERVICE_URL)
+      : JSON.stringify(process.env.APIKA_APP_URL),
     BUNDLE_VERSION: JSON.stringify(getVersion()),
+    //OPENAI_API_KEY: isDevMode ? process.env.OPENAI_API_KEY : "",
   }),
   dotenvPlugin(),
   json(),

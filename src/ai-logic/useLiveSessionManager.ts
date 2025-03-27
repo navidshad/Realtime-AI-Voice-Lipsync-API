@@ -1,15 +1,20 @@
 import { useAtom, useSetAtom } from "jotai";
 import { useRef } from "react";
 import {
-  liveSessionIdAtom,
   liveSessionAtom,
   sessionStartedAtom,
   conversationDialogsAtom,
   isMicrophoneMutedAtom,
   tokenUsageAtom,
 } from "../store/atoms";
-import { requestLiveSessionEphemeralToken } from "./utils";
-import { TokenUsage, LiveSession, EphemeralToken, AiTools } from "./types";
+import { isAsync, requestLiveSessionEphemeralToken } from "./utils";
+import {
+  TokenUsage,
+  LiveSession,
+  AiTools,
+  AiToolResponse,
+  AiToolHandler,
+} from "./types";
 
 export function useLiveSessionManager() {
   // State atoms
@@ -87,9 +92,11 @@ export function useLiveSessionManager() {
     try {
       // Create the session
       const session = await requestLiveSessionEphemeralToken({
-        voice: sessionDetails.voice,
+        voice: sessionDetails.voice || "alloy",
         instructions: sessionDetails.instructions,
-        tools: Object.values(tools).map((t) => t.definition),
+        tools: Object.values(tools)
+          .filter((t) => t !== undefined)
+          .map((t) => t.definition),
         tool_choice: "auto",
         turn_detection: {
           type: "server_vad",
@@ -199,7 +206,6 @@ export function useLiveSessionManager() {
     microphoneStreamRef.current = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
-
     microphoneTrackRef.current = microphoneStreamRef.current.getTracks()[0];
     peerConnectionRef.current.addTrack(microphoneTrackRef.current);
   };
@@ -209,10 +215,9 @@ export function useLiveSessionManager() {
       onUpdateCallbackRef.current(eventData);
     }
 
-    const { type, event_id, response_id } = eventData;
-
+    const { type, event_id } = eventData;
     if (type === "session.created") {
-      console.log("Session created", eventData.session);
+      console.log("Session created", event_id);
       if (onSessionCreatedCallbackRef.current) {
         onSessionCreatedCallbackRef.current(eventData);
       }
@@ -264,8 +269,6 @@ export function useLiveSessionManager() {
       mediaRecorderRef.current.state !== "inactive"
     ) {
       mediaRecorderRef.current.stop();
-      // Clear accumulated chunks
-      audioChunksRef.current = [];
       mediaRecorderRef.current = null;
     }
 
@@ -294,7 +297,7 @@ export function useLiveSessionManager() {
     return { success: true };
   };
 
-  const onFunctionCall = (eventData: any) => {
+  const onFunctionCall = async (eventData: any) => {
     if (!sessionToolsRef.current || !dataChannelRef.current) return;
 
     const [output01] = eventData.response.output;
@@ -304,9 +307,8 @@ export function useLiveSessionManager() {
     const args = JSON.parse(output01.arguments);
 
     const fn = sessionToolsRef.current[functionName];
-    let fnResponse: { success: boolean; [key: string]: any } = {
-      success: false,
-    };
+    const fnHandler = fn?.handler as AiToolHandler;
+    let fnResponse: AiToolResponse = { success: false };
 
     if (!fn) {
       console.error(`Function ${functionName} not found in tools`);
@@ -316,12 +318,20 @@ export function useLiveSessionManager() {
       };
     } else {
       try {
-        fnResponse = fn.handler(args);
+        if (isAsync(fnHandler)) {
+          // @ts-ignore
+          fnResponse = await fnHandler(args);
+        } else {
+          // @ts-ignore
+          fnResponse = fnHandler(args);
+        }
       } catch (error) {
         console.error("Error calling function", functionName, error);
         fnResponse = { success: false, message: String(error) };
       }
     }
+
+    console.log("Function call response", fnResponse);
 
     const response = {
       type: "conversation.item.create",
@@ -336,9 +346,15 @@ export function useLiveSessionManager() {
 
     dataChannelRef.current.send(JSON.stringify(response));
 
-    const continueResponse = {
+    const continueResponse: any = {
       type: "response.create",
     };
+
+    if (fnResponse.instructionsForAi) {
+      continueResponse["response"] = {
+        instructions: fnResponse.instructionsForAi,
+      };
+    }
 
     dataChannelRef.current.send(JSON.stringify(continueResponse));
   };
@@ -359,12 +375,12 @@ export function useLiveSessionManager() {
     const responseCreate = {
       type: "response.create",
       response: {
-        modalities: sessionModalitiesRef.current,
+        modalities: ["text", "audio"],
         instructions: instructions,
       },
     };
 
-    console.log("Sending system instructions:", responseCreate);
+    // console.log('Sending system instructions:', instructions);
 
     dataChannelRef.current.send(JSON.stringify(responseCreate));
   };
@@ -417,9 +433,9 @@ export function useLiveSessionManager() {
 
     if (tools) {
       // @ts-ignore
-      eventObject.session["tools"] = Object.values(tools).map(
-        (t) => t.definition
-      );
+      eventObject.session["tools"] = Object.values(tools)
+        .filter((t) => t !== undefined)
+        .map((t) => t.definition);
       sessionToolsRef.current = tools;
     }
 
