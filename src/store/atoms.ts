@@ -16,8 +16,8 @@ export const countWithUpdateAtom = atom(
 );
 
 // Theme atom example
-export type Theme = 'light' | 'dark';
-export const themeAtom = atom<Theme>('light');
+export type Theme = "light" | "dark";
+export const themeAtom = atom<Theme>("light");
 
 // User preferences atom example
 export interface UserPreferences {
@@ -27,7 +27,7 @@ export interface UserPreferences {
 
 export const userPreferencesAtom = atom<UserPreferences>({
   notifications: true,
-  language: 'en',
+  language: "en",
 });
 
 // Loading state atom example
@@ -46,5 +46,10 @@ export const tokenUsageAtom = atom<TokenUsage | null>(null);
 
 // Derived atoms for computed values
 export const isSessionActiveAtom = atom((get) => get(sessionStartedAtom));
-export const getConversationDialogsAtom = atom((get) => get(conversationDialogsAtom));
-export const getMicrophoneMutedAtom = atom((get) => get(isMicrophoneMutedAtom)); 
+export const getConversationDialogsAtom = atom((get) =>
+  get(conversationDialogsAtom)
+);
+export const getMicrophoneMutedAtom = atom((get) => get(isMicrophoneMutedAtom));
+
+// Flow selection atom
+export const selectedFlowAtom = atom<string>("flowFreeTestSteps");

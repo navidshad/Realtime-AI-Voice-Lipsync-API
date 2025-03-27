@@ -9,6 +9,9 @@ import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
 import { AiFlow } from "./pages/AiFlow";
 import { Config } from "./bootstrap/_init";
+import { useAtom } from "jotai";
+import { selectedFlowAtom } from "./store/atoms";
+import { flows } from "./flows";
 
 // Declare the global apika interface
 declare global {
@@ -21,6 +24,25 @@ declare global {
     };
   }
 }
+
+// FlowSelector component
+const FlowSelector: React.FC = () => {
+  const [selectedFlow, setSelectedFlow] = useAtom(selectedFlowAtom);
+
+  return (
+    <select
+      value={selectedFlow}
+      onChange={(e) => setSelectedFlow(e.target.value)}
+      className="p-2 border rounded-md"
+    >
+      {Object.keys(flows).map((flowKey) => (
+        <option key={flowKey} value={flowKey}>
+          {flowKey}
+        </option>
+      ))}
+    </select>
+  );
+};
 
 export function App() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
@@ -77,6 +99,9 @@ export function App() {
                         >
                           AI Assistant
                         </Link>
+                      </div>
+                      <div className="flex justify-center mt-4">
+                        <FlowSelector />
                       </div>
                     </nav>
                     <header className="app-header flex flex-col items-center justify-center">

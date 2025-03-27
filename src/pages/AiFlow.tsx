@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { conversationDialogsAtom } from "../store/atoms";
+import { conversationDialogsAtom, selectedFlowAtom } from "../store/atoms";
 import { useFlowManager } from "../ai-logic/useFlowManager";
 import { flows } from "../flows/index";
 
 export const AiFlow: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [selectedFlow] = useAtom(selectedFlowAtom);
 
   const {
     initializeFlow,
@@ -15,10 +16,9 @@ export const AiFlow: React.FC = () => {
     isMicrophoneMuted,
     sessionStarted,
   } = useFlowManager({
-    steps: flows.flowFreeTestSteps,
+    steps: flows[selectedFlow],
     onBeforeStepTransition: async (step) => {
       console.log("onBeforeStepTransition async", step);
-
       return Promise.resolve();
     },
   });
