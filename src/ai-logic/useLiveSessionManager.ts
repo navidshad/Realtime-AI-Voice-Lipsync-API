@@ -58,7 +58,10 @@ export function useLiveSessionManager() {
     tools: AiTools;
     onUpdate?: (data: any) => void;
     onSessionCreated?: () => void;
-    onAiSoundStreamed?: (webmBlob: Blob, responseId?: string) => void;
+    onAiSoundStreamed?: (
+      webmBlob: Blob,
+      responseId?: string
+    ) => void | Promise<void>;
     audioRef: HTMLAudioElement | null;
   }) => {
     console.log("createLiveSession");

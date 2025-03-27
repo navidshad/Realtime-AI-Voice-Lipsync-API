@@ -54,7 +54,6 @@ export const AiCharacter: React.FC = () => {
         );
       },
       onAiSoundStreamed: onAiSoundStreamed,
-      onUpdate: onUpdate,
     });
   }
 
@@ -87,7 +86,7 @@ export const AiCharacter: React.FC = () => {
     // }
   }
 
-  async function onAiSoundStreamed(webmBlob: Blob, responseId: string) {
+  async function onAiSoundStreamed(webmBlob: Blob, responseId?: string) {
     const lipSyncData = await generateSpeechWithLipSync({ webmBlob });
     avatarRef.current?.provideLipSyncData(lipSyncData as any);
   }
