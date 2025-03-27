@@ -10,7 +10,6 @@ variables:
   IMAGE_TAG: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
   SERVICE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
   PORT: 8080  # Explicitly set PORT for Cloud Run
-  APIKA_APP_URL: "https://${SERVICE_NAME}-${CI_ENVIRONMENT_SLUG}.a.run.app"  # URL for Cloud Run service
 
 .gitlab_job:
   image: docker:24.0.5
