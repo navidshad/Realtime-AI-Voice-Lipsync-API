@@ -49,6 +49,36 @@ export const lmsBeApi = {
       return undefined;
     }
   },
+  getCoursesByTutors: async (tutors: string[]): Promise<CourseList | undefined> => {
+    try {
+      const serializedTutors = tutors.join(',')
+      console.log('serialized', serializedTutors)
+      const response = await fetch(`${baseUrl}/api/courses/?tutor_name=${serializedTutors}`);
+      if (!response.ok) {
+        console.error(`Failed to fetch courses with tutor ${serializedTutors}`);
+        return undefined;
+      }
+      return response.json().then(toCamelCase);
+    } catch (error) {
+      console.error(`Error fetching courses with tutor: ${error}`);
+      return undefined;
+    }
+  },
+  getCoursesByPlan: async (plans: string[]): Promise<CourseList | undefined> => {
+    try {
+      const serializedPlans = plans.join(',')
+      console.log('serialized', serializedPlans)
+      const response = await fetch(`${baseUrl}/api/courses/?plan=${serializedPlans}`);
+      if (!response.ok) {
+        console.error(`Failed to fetch courses with plan ${serializedPlans}`);
+        return undefined;
+      }
+      return response.json().then(toCamelCase);
+    } catch (error) {
+      console.error(`Error fetching courses with plan: ${error}`);
+      return undefined;
+    }
+  },
   getCourse: async (courseId: string): Promise<CourseSingle | undefined> => {
     try {
       const response = await fetch(`${baseUrl}/api/courses/${courseId}`);
