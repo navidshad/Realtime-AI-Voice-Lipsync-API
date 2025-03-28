@@ -5,6 +5,7 @@ import { ConversationDialog } from "../../../ai-logic/types";
 import { AudioVisualizer } from "../../unit";
 import { SceneManager } from "../../../hooks/useSceneManager";
 import {markdownToHtml} from "../../../utils/markdown-to-html";
+import CourseList from "../../shared/CourseList";
 
 const SceneModule: React.FC<{
   toggleMicrophone: () => void;

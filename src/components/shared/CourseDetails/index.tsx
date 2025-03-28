@@ -1,13 +1,13 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { Course } from "../../types";
+import { type CourseDetails } from "../types";
 
-type CourseCardProps = {
-  course: Course;
+type CourseDetailsCardProps = {
+  course: CourseDetails;
   onSelect?: (courseId: string) => void;
 };
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
+const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
 
   return (
     <div className="flex flex-col rounded-2.5xl shadow-card">
@@ -31,23 +31,37 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
       </header>
 
       <div className={"rounded-b-2.5xl p-6 text-gray-900"}>
-        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg">{course.title}</p>
+        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg font-semibold">{course.title}</p>
         
-        <div className="mt-6 text-xs">
+        <p className="mb-4 text-sm text-gray-600 line-clamp-3">{course.description}</p>
+
+        <div className="mt-4 space-y-2 text-xs">
           {course.tutors && (
             <p className="mb-2">
-              Tutors: {course.tutors.join(", ")}
+              <span className="font-medium">Tutors:</span> {course.tutors.join(", ")}
             </p>
           )}
           {course.difficultyLevel && (
-            <p>Level: {course.difficultyLevel}</p>
+            <p>
+              <span className="font-medium">Level:</span> {course.difficultyLevel}
+            </p>
+          )}
+          {course.duration && (
+            <p>
+              <span className="font-medium">Duration:</span> {course.duration}
+            </p>
+          )}
+          {course.id && (
+            <p>
+              <span className="font-medium">Course ID:</span> {course.id}
+            </p>
           )}
         </div>
 
         <button
           onClick={() => null}
           className={twMerge(
-            "mt-3 w-full py-2.75",
+            "mt-6 w-full py-2.75",
             "btn-primary"
           )}
         >
@@ -58,4 +72,4 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
   );
 };
 
-export default CourseCard;
+export default CourseDetailsCard;

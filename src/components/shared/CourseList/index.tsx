@@ -1,15 +1,6 @@
 import React from "react";
-import CourseCard from "../CourseCard";
-
-type Course = {
-  id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  syllabus?: string[];
-  highlights?: string[];
-};
+import CourseCard from "../CourseDetails/CourseCard";
+import { Course } from "../types";
 
 type CourseListProps = {
   courses: Course[];

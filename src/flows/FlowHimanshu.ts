@@ -1,5 +1,6 @@
 import { Flow } from "./types";
 import categories from "./categories.json";
+import { Course, CourseDetails } from "../components/shared/types";
 
 const FlowHimanshu: Flow = (setActiveScene) => [
   {
@@ -188,24 +189,30 @@ const FlowHimanshu: Flow = (setActiveScene) => [
           console.log(`Mock fetchCourses called with topic: ${category}`);
           const data = [
             {
-              id: "course-1",
+              id: "course-1", 
               title: `Intro to ${category}`,
-              description: `A beginner-friendly introduction to ${category}.`,
-              level: "Beginner",
+              thumbnailUrl: "https://placekitten.com/300/200",
+              tutors: ["John Doe", "Jane Smith"],
+              plan: "Free",
+              difficultyLevel: "Beginner"
             },
             {
               id: "course-2",
               title: `${category} Advanced`,
-              description: `An advanced course diving deep into ${category}.`,
-              level: "Advanced",
+              thumbnailUrl: "https://placekitten.com/300/201", 
+              tutors: ["Alice Johnson"],
+              plan: "Pro",
+              difficultyLevel: "Advanced"
             },
             {
               id: "course-3",
               title: `${category} Hands-On Projects`,
-              description: `Practice ${category} through real-world projects.`,
-              level: "Intermediate",
-            },
-          ];
+              thumbnailUrl: "https://placekitten.com/300/202",
+              tutors: ["Bob Wilson", "Carol Taylor"],
+              plan: "Pro",
+              difficultyLevel: "Intermediate"
+            }
+          ] as Course[];
           setActiveScene({ type: "list", data });
           return {
             success: true,
@@ -254,24 +261,15 @@ const FlowHimanshu: Flow = (setActiveScene) => [
           console.log(
             `Mock fetchCourseDetails called with courseId: ${courseId}`
           );
-          const data = {
+          const data: CourseDetails = {
             id: courseId,
-            title: "Mock Course Title",
-            description:
-              "This is a detailed description of the selected course.",
-            level: "Intermediate",
+            title: "Mock Course Title", 
+            description: "This is a detailed description of the selected course.",
             duration: "6 hours",
-            syllabus: [
-              "Module 1: Introduction",
-              "Module 2: Core Concepts",
-              "Module 3: Hands-On Labs",
-              "Module 4: Final Project",
-            ],
-            highlights: [
-              "100% hands-on",
-              "Certificate of Completion",
-              "Lifetime Access",
-            ],
+            difficultyLevel: "Intermediate",
+            tutors: ["John Doe", "Jane Smith"],
+            plan: "Premium",
+            thumbnailUrl: "/images/mock-course.jpg"
           };
           setActiveScene({ type: "details", data });
           return {
