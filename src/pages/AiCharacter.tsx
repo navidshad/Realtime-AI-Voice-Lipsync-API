@@ -129,7 +129,7 @@ export const AiCharacter: React.FC = () => {
         }}
       >
         {/* Presentation Section */}
-        {lastAiDialog && (
+        {/* {lastAiDialog && (
           <div
             style={{
               padding: "20px",
@@ -144,7 +144,7 @@ export const AiCharacter: React.FC = () => {
           >
             {lastAiDialog.content}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Action Buttons Section */}

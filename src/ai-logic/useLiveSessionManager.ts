@@ -50,6 +50,7 @@ export function useLiveSessionManager() {
   const onAiSoundStreamedRef = useRef<
     ((webmBlob: Blob, responseId?: string) => void) | null
   >(null);
+  const onInterruptionRef = useRef<(() => void) | null>(null);
 
   /*
    * Creating and configuring a live session
@@ -236,6 +237,8 @@ export function useLiveSessionManager() {
         updateTokenUsage(eventData.response.usage);
         updateLiveSessionRecordOnServer();
       }
+    } else if (type === "conversation.item.truncated") {
+      onInterruptionRef.current?.();
     } else if (type === "error") {
       console.error("Error from AI", eventData);
     }
@@ -247,8 +250,17 @@ export function useLiveSessionManager() {
           audioElementRef.current!.volume = 0;
         }
 
-        customMediaRecorderRef.current!.start();
-      } else if (type == "output_audio_buffer.stopped") {
+        // find the last dialog
+        const { response_id } = eventData;
+        const lastDialog = conversationDialogs.find(
+          (d) => d.id === response_id
+        );
+
+        customMediaRecorderRef.current!.start(lastDialog?.content);
+      } else if (
+        type == "output_audio_buffer.stopped" ||
+        type == "conversation.item.truncated"
+      ) {
         customMediaRecorderRef.current!.stop();
       }
     }
