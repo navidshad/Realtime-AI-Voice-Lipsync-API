@@ -1,0 +1,205 @@
+[
+  {
+    "id": "05e59ef5-61f8-4c2a-adc6-8c4b64a5bb11",
+    "name": "Mumshad Mannambeth",
+    "bio": "Founder of KodeKloud | an IT Consultant | Certified Kubernetes Administrator",
+    "description": "Mumshad is passionate about sharing his knowledge and teaches over 600,000+ students worldwide. He believes the best way to learn is to learn by doing and in a fun way. He has authored multiple courses on DevOps and Cloud & Automation technologies. Mumshad's courses focus on providing students with an interactive and hands-on experience in learning new technology that makes it fun & exciting.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/01/Trainer-Mumshad.png"
+  },
+  {
+    "id": "0a645c3e-61ae-48f0-bffa-7cb322103359",
+    "name": "Vijin Palazhi",
+    "bio": "Head of Technology at KodeKloud | HashiCorp and CNCF Trainer",
+    "description": "Vijin is a training architect at KodeKloud. He is an Infrastructure Specialist with over 13 years of experience in IT Infrastructure with expertise in DevOps, Cloud, Systems Engineering, Architecture and Automation. Vijin loves to share his knowledge creatively, which keeps students motivated and focused on learning!",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/01/Trainer-Vijin-Palazhi.png"
+  },
+  {
+    "id": "e6d31812-714f-41bd-b486-479e9b6ffb93",
+    "name": "Yogesh Raheja",
+    "bio": "DevOps, Automation and Cloud Coach and Consultant",
+    "description": "Yogesh Raheja is a certified DevOps and cloud expert with a decade of IT experience. He has expertise in technologies such as OS, source code management, build & release tools, continuous integration/deployment/delivery tools, containers, configuration management tools, monitoring, logging tools, and public/private clouds. He loves to share his technical expertise with audiences worldwide at various forums, conferences, webinars, blogs, and LinkedIn. He has written books on IT automation named Effective DevOps with AWS, Automation with Puppet 5 and Automation with Ansible which has been published by John & Wiley and Packt Publisher. He has also reviewed some of the DevOps books for multiple Publishers.",
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1?v=4&s=400"
+  },
+  {
+    "id": "b3b83f23-da3c-46c9-a030-4498e6ae04d0",
+    "name": "Lydia Hallie",
+    "bio": "Software Engineer, Technical Instructor",
+    "description": "Lydia is a software consultant, international speaker, course instructor, and tech influencer with a great passion for coding who has also mentored a lot of new and advanced developers and helped them improve and optimize their work. By writing technical blog posts in a visual way, Lydia shows people that some complex topics aren’t as overwhelming as they seem at first!",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/01/Trainer-Lydia-Hallie.png"
+  },
+  {
+    "id": "9caf2652-d081-43c9-9919-647da071178c",
+    "name": "Sevi Karaköse",
+    "bio": "Software Architect, Technical Instructor",
+    "description": "Sevi has worked as a software developer and then a team leader for many years. And now as a software architect, she works with development teams on their legacy applications for microservices transformation and cloud modernization. She is an avid practitioner of DevOps and Agile methodologies. She has also done technical training, worked with development and infrastructure teams on DevOps transformation,and also designed team activities for organizations to be more adaptive to change.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/01/Trainer-Sevi-Karako%E2%95%A0ese.png"
+  },
+  {
+    "id": "7c5920bf-64c2-4d0a-8720-deef03937e78",
+    "name": "Priyanka Yadav",
+    "bio": "Software Engineer at LinkedIn",
+    "description": "Priyanka, is a software engineer by profession. She likes dabbling with different technologies, by writing  blogs and creating projects. When she's not wearing the work hat, she's usually found learning or teaching something new about engineering",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/01/Trainer-Priyanka-Yadav.png"
+  },
+  {
+    "id": "4a5772b3-0ea1-4799-b0d8-1d479dec9a7e",
+    "name": "Aaron Lockhart",
+    "bio": "Linux Foundation Certified System Administrator",
+    "description": "Aaron is a technical trainer at KodeKloud. He is a Linux and UNIX specialist with over 20 years of Linux experience. During his career, Aaron has seen Linux change and mature substantially, and has enjoyed working with Linux as it evolved. Whether working to deploy and manage Linux-based solutions in large enterprises, or mentoring others, Aaron enjoys putting his Linux knowledge to use to help others.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/04/Trainer-Aaron-Lockhart.png"
+  },
+  {
+    "id": "5b57b94b-78a3-4700-8357-4d19dcc2f9e9",
+    "name": "Alexandru Andrei",
+    "bio": "Technical Writer",
+    "description": "Linux had an immensely positive impact on Alexandru's life. He's living the dream, getting paid to do what he loves. You can find his tutorials on websites such as DigitalOcean, Alibaba Cloud, or Linode. He believes the Linux ecosystem is elegantly simple. And he wants to help others discover the beauty, simplicity, and power of this ecosystem",
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1?v=4&s=400"
+  },
+  {
+    "id": "1e1b6f9c-e0d5-4f05-b1c3-53146a5e784e",
+    "name": "Michael Levan",
+    "bio": "DevOps Researcher, Advisor, & Consultant",
+    "description": "Michael Levan is a seasoned engineer and consultant who spends his time working with startups and enterprises around the globe on SRE and DevOps projects. He also performs technical research as an analyst, creates real-world, project-focused content, and coaches engineers on how to cognitively embark on their engineering journey. He is a cloud enthusiast, DevOps pro, HashiCorp Ambassador, and loves helping the tech community by speaking internationally and blogging.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/02/Trainer-Michael-Levan-1.png"
+  },
+  {
+    "id": "f710eac8-352c-4107-be34-1de09589cae4",
+    "name": "Raghunandan Sanur",
+    "bio": "Senior Data Platform Engineer",
+    "description": "Raghunandana has 8+ years of IT experience in Data platforms and Data Engineering. He is closely related to the DevOps tech stack and likes to bridge the gap between the Data and the DevOps world. He has worked in different sectors and startup ecosystems in the past years and has 7+ years of training experience focused on learning concepts based on tech/businesses use cases giving the best understanding of why we learn a tool or a tech stack.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/06/Trainer-Raghunandana-Sanur.png"
+  },
+  {
+    "id": "4efc1b91-8015-421c-9516-ef4ef13e58bf",
+    "name": "Barahalikar Siddharth",
+    "bio": "Trainer - MuleSoft | Kubernetes | DevSecOps",
+    "description": "Siddharth is a Technical Architect and specialized in API Management and DevOps Technologies. For most of his career, he worked on various API Management tools like Google Apigee, Wso2, Layer7, MuleSoft, DevSecOps, and Kubernetes. He is deeply passionate about using technology to drive the creation of innovative technical solutions and products.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/08/Trainer-Siddharth.png"
+  },
+  {
+    "id": "fdcc5e40-d2fc-4695-bbf7-92e1855bd282",
+    "name": "Rithin Skaria",
+    "bio": "Author | Speaker | Trainer (MCT)",
+    "description": "Rithin is a Cloud Enthusiast with 9+ years of experience in administering and managing infrastructure and 4+ years of experience delivering freelance technical training on Linux, Openstack, Kubernetes, and Azure Services. With his advanced knowledge in Azure, AWS, and OpenStack Cloud, he has authored several books on these subjects. Expert in virtualization and hypervisors like Hyper-V, VMWare EXSi, and XenServer.Linux Evangelist, certified in LFCE, LFCS, CKA, and CKAD. He has created his own Linux flavor as a part of the LFS and BLFS Project.Rithin is also the author of “MCA Microsoft Certified Associate Azure Administrator Study Guide: Exam AZ-104” and has co-authored several books like “Hands-on Linux Administration on Azure - Second Edition” and “Azure for Architects - Third Edition” and “Migrating Linux to Azure. He is also an active Technical Reviewer for several Packt projects on Azure and OSS.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/06/Trainer-Rithin.png"
+  },
+  {
+    "id": "c7447605-d1fc-4b9d-a6cb-8f4448eee86e",
+    "name": "Bryan Krausen",
+    "bio": "HashiCorp Ambassador",
+    "description": "Created by an experienced instructor, Bryan has been delivering official HashiCorp training for many years. These training classes vary between private, in-depth training, personalized advanced training, all the way to the official training courses listed on HashiCorp’s website (seriously, go look!). Bryan was one of the first people to earn all of the HashiCorp certifications and has spoken at multiple HashiCorp conferences and community events. He is also a HashiCorp Ambassador for 2020, 2021, and 2022.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/05/Trainer-Bryan-300x300.png"
+  },
+  {
+    "id": "f226b00e-ce26-49ba-a6f1-6449539b4a5a",
+    "name": "Sanjeev Thiyagarajan",
+    "bio": "Network Engineer, Trainer",
+    "description": "Sanjeev has 8+ years of IT experience working primarily as a network engineer for prominent network vendors. He has worked on designing & testing large networks for Fortune 500 companies ranging from Enterprise Customers to Cloud & Service providers. Sanjeev has been creating online courses for several years, teaching various topics, including programming, automation, and cloud.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/08/Trainer-Sanjeev.png"
+  },
+  {
+    "id": "dcc40a04-b49a-4e89-a9f4-24a35b248094",
+    "name": "Harsh Joshi",
+    "bio": "Professional Software Engineer",
+    "description": "Harsh is a professional software engineer. He is enthusiastic about teaching and dev advocacy. His instincts as a trainer lie in deriving simplicities from otherwise complex topics.Open source had a significant impact on his journey. His idea is to bring some light to the open source ecosystem and what it holds for the future while helping people take their first steps in pursuing and succeeding in building something good for today and tomorrow.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/09/Trainer-Harsh.png"
+  },
+  {
+    "id": "7e8f3f54-34e4-4ac0-a9d3-cffb7770b66b",
+    "name": "Matthew Burch",
+    "bio": "Cybersecurity, AWS Cloud, and Network Engineering Professor",
+    "description": "Matthew has 20+ years of experience as a network engineer, IT manager, and instructor for network, cloud, and cybersecurity courses. During his career, Matthew has attained some of the top professional and teaching certifications in IT and managed large enterprise networks for several corporations. Matthew is passionate about learning new technology and sharing knowledge with others so they can reach their full potential. He enjoys designing gamified labs and technologies that challenge the participants to solve real-world problems in IT.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/12/Trainer-Matthew-Burch-1.png"
+  },
+  {
+    "id": "29f519c8-d80b-45e6-9948-72eb75c331a6",
+    "name": "Gabe Maentz",
+    "bio": "Director of Solution Architecture",
+    "description": "Gabe Maentz is a Solutions Architect who has trained thousands of people within the HashiCorp and DevOps ecosystem.  As an active practitioner of these technologies, Gabe enjoys bringing real world scenarios into his training courses for his students to build experience from.  He has taught numerous private and personalized courses ranging from beginner to advanced for Fortune 1000 and start up companies. Gabe has been recognized by HashiCorp as a HashiCorp Ambassador since the inception of the program as well has been appointed a Hashicorp Authorized instructor for Terraform, Vault and Consul.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/10/Trainer-Gabe.png"
+  },
+  {
+    "id": "5eebb6ba-c975-45ab-9029-b6a2d3a32fc2",
+    "name": "Raghunandana Sanur",
+    "bio": "Senior Data Platform Engineer",
+    "description": "Raghunandana has 8+ years of IT experience in Data platforms and Data Engineering. He is closely related to the DevOps tech stack and likes to bridge the gap between the Data and the DevOps world.  He has worked in different sectors and startup ecosystems in the past years and has 7+ years of training experience focused on learning concepts based on tech/businesses use cases giving the best understanding of why we learn a tool or a tech stack.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2022/06/Trainer-Raghunandana-Sanur.png"
+  },
+  {
+    "id": "9644e62f-7a33-4841-b7b8-38ed1f277f08",
+    "name": "Pranav Holavanahalli",
+    "bio": "Director - Cloud Engineering",
+    "description": "Pranav is an accomplished freelance Solution Architect and Consultant residing in Melbourne, Australia. With a primary focus on solution and application architectures, as well as security within the realms of Azure and AWS, Pranav diligently monitors advancements in the field of Data and AI Services. Prior to embarking on his freelance journey, Pranav served as a Senior Cloud Solution Architect at Microsoft, where he gained invaluable expertise and experience.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/06/Trainer-Pranav-e1688107847809.png"
+  },
+  {
+    "id": "13d30466-8486-4e7d-8fa1-0fc586e0651f",
+    "name": "Michael Forrester",
+    "bio": "Principal Trainer at KodeKloud, DevOps Advocate, Certified AWS DevOps Engineer with 11 additional AWS certifications",
+    "description": "Michael has 20+ years of experience in the IT industry, primarily in DevOps and Cloud.He has contributed to various large-scale companies like AWS, Redhat, Thoughtworks, and Honeywell. Michael has been teaching and creating courses for several years. He has expertise across various subjects such as Linux, DevOps, K8s, HashiTools, and AWS Cloud.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/05/Trainer-Michael.png"
+  },
+  {
+    "id": "ef0ce21f-ea8c-465d-bb12-6015d2de2110",
+    "name": "Juan Carlos Martinez",
+    "bio": "Trainer, Backend Engineer",
+    "description": "Juan Carlos Martinez is an IT professional with 12+ years of experience. He considers himself a deep generalist, having held roles as a System Administrator, Linux Support Engineer, Java Developer, and most recently, a Senior DevOps Engineer. He’s worked across various sectors, including Fortune 500 retail companies and large financial firms, and has been involved in projects for top tech companies. Beyond his work, Juan Carlos dedicates time to training and mentoring engineers across Latin America and Mexico, helping them transition to DevOps roles. His efforts are driven by a deep passion for learning and teaching.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/06/Trainer-Juan-Carlos-e1686814900932.png"
+  },
+  {
+    "id": "418eef12-d66e-445b-a8e3-8e5c5ec99a7a",
+    "name": "Peter Vogel",
+    "bio": "System Architect and Principal in PH&V Information Services",
+    "description": "He is a passionate and dedicated course instructor whose love for teaching is matched only by his unwavering commitment to outcome-driven learning. He has written multiple books in technology field. With a wealth of experience and expertise in the field of education, Peter has become a leading advocate for a teaching philosophy that prioritizes measurable results and empowers students to achieve their fullest potential.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/10/Trainer-Vogel-e1696583759810.png"
+  },
+  {
+    "id": "4353b853-083b-4347-8c58-b377c83d364e",
+    "name": "Janakiram MSV",
+    "bio": "Technology analyst, advisor, architect, and a thought leader in the cloud computing and IoT space",
+    "description": "He has experience working with companies like Microsoft, Amazon Web Services, and Bell Labs, and he has held various technical and management roles in these organizations. Janakiram is also a public speaker and a prolific writer, contributing to several technology publications. He is known for his expertise in cloud computing, particularly around platforms like AWS, Azure, and Google Cloud Platform, as well as his insights on emerging technologies such as Kubernetes, microservices, serverless computing, IoT, and edge computing.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/09/Trainer-Janakiram-e1694589143486.png"
+  },
+  {
+    "id": "20ddfff0-4bac-4b39-967a-edc162357ebb",
+    "name": "Anu Phoghat",
+    "bio": "Principal Consultant",
+    "description": "Anu Phoghat is a Principal Consultant specializing in  Google Cloud Platform (GCP) with a strong focus on professional development. With over 15 years of experience, he has acheived numerous professional-level certifications in leading cloud and container orchestration platforms. Coming from storage and virtualisation background during his tenure at EMC as Enterprise Solutions Architect, Anu has gained extensive experience in digital modernisation, platform engineering and is currently working at Cognizant as an Associate Director. His primary area of expertise lies in architecting and implementing solutions across different technology stacks in Cloud Platforms. He has worked on numerous client engagements, delivering tailored and cutting-edge solutions specific to Google Cloud.",
+    "avatar_url": "https://kodekloud.com/wp-content/uploads/2023/08/Trainer-Anu-Phoghat-e1693388071870.png"
+  },
+  {
+    "id": "7b8c5443-63fc-41d9-9e8f-0de5587d5a6a",
+    "name": "Ivan Kropotov",
+    "bio": "Proident nulla ipsum cillum qui do cillum consectetur nisi commodo irure.",
+    "description": "Laboris id Lorem laboris est. Eu aliquip esse non reprehenderit labore cupidatat deserunt consectetur proident consectetur.",
+    "avatar_url": "https://dev.v3.kodekloud.com/_next/image?url=%2Fimg%2Ffallback.png&w=3840&q=75"
+  },
+  {
+    "id": "114456d0-6545-4eba-83c3-2a5ffbf08fb1",
+    "name": "Gray Ang",
+    "bio": "Excepteur duis ex tempor fugiat aute.",
+    "description": "In ex consequat nulla sunt. Reprehenderit culpa qui deserunt consectetur incididunt dolor nulla voluptate.",
+    "avatar_url": "https://dev.v3.kodekloud.com/_next/image?url=%2Fimg%2Ffallback.png&w=3840&q=75"
+  },
+  {
+    "id": "63eaea21-d5f0-4a47-b1ca-457b0da2bb2d",
+    "name": "Jeremy Morgan",
+    "bio": "Innovative Tech Leader, Linux Expert, & Educator",
+    "description": "Jeremy Morgan is a Senior Training Architect with endless enthusiasm for learning and sharing knowledge. Since transitioning from an engineering practitioner to an instructor in 2019, he has been dedicated to helping others excel. Passionate about DevOps, Linux, Machine Learning, and Generative AI, Jeremy actively shares his expertise through videos, articles, talks, and his tech blog, which attracts 9,000 daily readers. His work has been featured on Lifehacker, Wired, Hacker News, and Reddit.",
+    "avatar_url": "https://res.cloudinary.com/kodekloud/image/upload/v1719395238/trainer%20images/Trainer_-_Jeremy.png"
+  },
+  {
+    "id": "be146df1-20e2-4aaf-942d-bbec806067dd",
+    "name": "Jeremy Morgan",
+    "bio": "Innovative Tech Leader, Linux Expert, & Educator",
+    "description": "Jeremy Morgan is a Senior Training Architect with endless enthusiasm for learning and sharing knowledge. Since transitioning from an engineering practitioner to an instructor in 2019, he has been dedicated to helping others excel. Passionate about DevOps, Linux, Machine Learning, and Generative AI, Jeremy actively shares his expertise through videos, articles, talks, and his tech blog, which attracts 9,000 daily readers. His work has been featured on Lifehacker, Wired, Hacker News, and Reddit.",
+    "avatar_url": "https://res.cloudinary.com/kodekloud/image/upload/v1719395238/trainer%20images/Trainer_-_Jeremy.png"
+  },
+  {
+    "id": "d5517fb9-e59f-4244-a41b-8ce825af823c",
+    "name": "Mohsen Amiribesheli, PhD",
+    "bio": "Senior Architect and AI Lead",
+    "description": "As a Senior Technical Architect and AI Lead, Mohsen specializes in MLOps, Generative AI, and cloud-native solutions, transforming industries like manufacturing and FinTech. With a PhD in AI and extensive experience, he develops scalable AI systems, optimizes workflows, and drives innovation. He is passionate about mentoring future AI leaders and advancing the field through research and thought leadership, inspiring transformative change across industries. Engage with him on AI-driven transformation, collaborations, or the future of technology.",
+    "avatar_url": "https://res.cloudinary.com/kodekloud/image/upload/v1731572236/Trainer_-_Mohsen.png"
+  }
+]
