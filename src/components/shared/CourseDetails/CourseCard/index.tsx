@@ -36,6 +36,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
         <div className="mt-6 text-xs">
           {course.tutors && (
             <p className="mb-2">
+              {/* @ts-ignore */}
               Tutors: {course.tutors.map(t => t.name).join(', ')}
             </p>
           )}
