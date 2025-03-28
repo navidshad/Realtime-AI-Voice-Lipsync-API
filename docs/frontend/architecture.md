@@ -2,7 +2,7 @@
 
 ## Overview
 
-The APIKA frontend is a modern React application built with TypeScript, focusing on a responsive and interactive UI for the AI-powered virtual course consultant. The architecture follows component-based design principles with a clear separation of concerns, allowing for modularity and maintainability.
+The APIKA frontend is a modern React application built with TypeScript, focusing on a responsive and interactive UI for the AI-Powered Interactive KodeKloud Assistant (APIKA). The architecture follows component-based design principles with a clear separation of concerns, allowing for modularity and maintainability.
 
 ## Directory Structure
 

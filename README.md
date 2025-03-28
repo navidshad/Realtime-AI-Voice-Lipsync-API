@@ -1,4 +1,4 @@
-# APIKA - AI-Powered Virtual Course Consultant
+# AI-Powered Interactive KodeKloud Assistant (APIKA)
 
 APIKA is an interactive conversational AI assistant designed to streamline the course discovery process for KodeKloud applications. This assistant provides real-time, voice- and text-based consultations to guide users toward the most relevant DevOps courses and learning paths through a dynamic and personalized interface.
 

@@ -1,6 +1,6 @@
 # APIKA Documentation
 
-This directory contains comprehensive documentation for the APIKA AI-Powered Virtual Course Consultant project. The documentation is organized according to the standard template, with sections covering all aspects of the system from architecture to operation.
+This directory contains comprehensive documentation for the AI-Powered Interactive KodeKloud Assistant (APIKA) project. The documentation is organized according to the standard template, with sections covering all aspects of the system from architecture to operation.
 
 ## Documentation Structure
 

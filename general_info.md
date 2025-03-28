@@ -1,4 +1,4 @@
-# Project Name: AI-Powered Virtual Course Consultant - APIKA
+# Project Name: AI-Powered Interactive KodeKloud Assistant (APIKA)
 
 ## Problem Statement
 Learners often struggle to navigate through large course libraries, leading to decision fatigue and drop-offs. Traditional filtering and browsing methods are insufficient for identifying the most suitable DevOps learning paths based on individual user goals, experience levels, and interests. This lack of personalization hinders user engagement and slows down course adoption.
