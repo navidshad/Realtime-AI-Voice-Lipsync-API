@@ -2,7 +2,7 @@ export const markdownToHtml = (markdown: string) => {
   if (!markdown) return '';
   
   // Log the markdown being converted
-  console.log("Converting markdown to HTML:", markdown);
+  //console.log("Converting markdown to HTML:", markdown);
   
   // Extract code blocks first to avoid processing their content
   const codeBlocks: string[] = [];
@@ -22,6 +22,9 @@ export const markdownToHtml = (markdown: string) => {
     inlineCodeSnippets.push(code.trim());
     return placeholder;
   });
+  
+  // Convert images ![alt](url) - do this before links to avoid conflicts
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
   
   // Convert links [text](url)
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
@@ -73,7 +76,7 @@ export const markdownToHtml = (markdown: string) => {
   });
   
   // Log the HTML result
-  console.log("Converted HTML:", html);
+  //console.log("Converted HTML:", html);
   
   return html;
 }

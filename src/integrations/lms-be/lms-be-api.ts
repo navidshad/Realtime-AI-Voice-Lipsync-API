@@ -3,6 +3,23 @@ import {isLocalhost} from "../../constants";
 
 const baseUrl = `https://learn-api${isLocalhost && '.dev'}.kodekloud.com`
 
+// Function to convert keys from snake_case to camelCase
+const toCamelCase = (obj: any): any => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase);
+  }
+
+  return Object.keys(obj).reduce((acc, key) => {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    acc[camelKey] = toCamelCase(obj[key]);
+    return acc;
+  }, {} as any);
+};
+
 export const lmsBeApi = {
   searchCourses: async (search: string): Promise<CourseList | undefined> => {
     return fetch(`${baseUrl}/api/courses/?search=${search}`)
@@ -10,12 +27,27 @@ export const lmsBeApi = {
         if (!res.ok) {
           return undefined
         }
-        return res.json();
+        return res.json().then(toCamelCase);
       })
       .catch((e) => {
         console.error(e);
         return undefined
       });
+  },
+  getCoursesByCategories: async (categories: string[]): Promise<CourseList | undefined> => {
+    try {
+      const serializedCategories = categories.join(',')
+      console.log('serialized', serializedCategories)
+      const response = await fetch(`${baseUrl}/api/courses/?category=${serializedCategories}`);
+      if (!response.ok) {
+        console.error(`Failed to fetch courses with category ${serializedCategories}`);
+        return undefined;
+      }
+      return response.json().then(toCamelCase);
+    } catch (error) {
+      console.error(`Error fetching courses with categories: ${error}`);
+      return undefined;
+    }
   },
   getCourse: async (courseId: string): Promise<CourseSingle | undefined> => {
     try {
@@ -24,7 +56,7 @@ export const lmsBeApi = {
         console.error(`Failed to fetch course with ID ${courseId}`);
         return undefined;
       }
-      return response.json();
+      return response.json().then(toCamelCase);
     } catch (error) {
       console.error(`Error fetching course with ID ${courseId}: ${error}`);
       return undefined;

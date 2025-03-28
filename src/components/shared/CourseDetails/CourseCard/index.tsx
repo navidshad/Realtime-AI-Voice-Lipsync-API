@@ -16,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="relative h-full w-full object-cover object-right-bottom"
+            className="relative h-full w-full object-contain object-right-bottom"
           />
         )}
 
@@ -36,7 +36,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
         <div className="mt-6 text-xs">
           {course.tutors && (
             <p className="mb-2">
-              Tutors: {course.tutors.join(", ")}
+              Tutors: {course.tutors.map(t => t.name).join(', ')}
             </p>
           )}
           {course.difficultyLevel && (

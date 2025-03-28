@@ -8,7 +8,6 @@ type CourseDetailsCardProps = {
 };
 
 const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
-
   return (
     <div className="flex flex-col rounded-2.5xl shadow-card">
       <header className="relative h-64 overflow-hidden rounded-t-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
@@ -16,7 +15,7 @@ const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="relative h-full w-full object-cover object-right-bottom"
+            className="relative h-full w-full object-contain object-right-bottom"
           />
         )}
 

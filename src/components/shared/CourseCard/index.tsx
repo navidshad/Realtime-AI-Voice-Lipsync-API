@@ -1,6 +1,6 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { Course } from "../../types";
+import { Course } from "../types";
 
 type CourseCardProps = {
   course: Course;
@@ -16,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="relative h-full w-full object-cover object-right-bottom"
+            className="relative h-full w-full object-contain object-right-bottom"
           />
         )}
 
