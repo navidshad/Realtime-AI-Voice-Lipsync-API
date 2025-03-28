@@ -8,6 +8,33 @@ body {
     background: #f7f7f7;
 }
 
+#apika-text-area pre{
+  background: rgb(215 229 255);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: -1px 0px 3px 0px inset #1e2938;
+}
+
+#apika-text-area .inline-code {
+  background: #d7e6ff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin: 1px;
+  border: 1px solid;
+}
+
+#apika-text-area ol {
+  list-style-type: disclosure-closed;
+  padding-left: 20px;
+}
+
+#apika-text-area a {
+  color: #386cff;
+  text-decoration: underline;
+}
+
+
+
 @layer utilities {
   @keyframes slide-in-right {
     0% {
