@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useLiveSessionManager } from "./useLiveSessionManager";
-import { AiTools } from "./types";
+import { AiToolResponse, AiTools } from "./types";
 import { isAsync } from "./utils";
 
 export type ConversationStep = {
@@ -8,10 +8,12 @@ export type ConversationStep = {
   instructions: string;
   tools?: AiTools;
   onEnter?: () => void;
+  exitCondition?: () => boolean;
   onExit?: () => void;
 };
 
 export type FlowConfig = {
+  globalInstructions?: string;
   steps: ConversationStep[];
   onBeforeStepTransition?: (step: ConversationStep) => void | Promise<void>;
   onComplete?: () => void;
@@ -36,10 +38,35 @@ export function useFlowManager(config: FlowConfig) {
   const stepsRef = useRef(config.steps);
 
   // Function to be provided to AI for step transitions
-  async function transitionToStep(options: { stepLabel: string }) {
+  async function transitionToStep(options: {
+    stepLabel: string;
+  }): Promise<AiToolResponse> {
     const targetIndex = stepsRef.current.findIndex(
       (step) => step.label.toLowerCase() === options.stepLabel.toLowerCase()
     );
+
+    /*
+      Only for forward transtions
+      - If the goal of the current step is not achieved, return false
+      - If the goal of the current step is achieved, return true
+    */
+    if (
+      // only for forward transtions
+      targetIndex > currentStepIndex &&
+      stepsRef.current[currentStepIndex].exitCondition
+    ) {
+      if (!stepsRef.current[currentStepIndex].exitCondition()) {
+        return {
+          success: false,
+          message: `The goal of the current step is not achieved.`,
+          instructionsForAi: `
+            - Please try to achieve the goal of the current step.
+            - If you are not sure how to achieve the goal, ask the user for clarification.
+            - If you are not sure what the goal of the current step is, ask the user for clarification.
+          `,
+        };
+      }
+    }
 
     if (config.onBeforeStepTransition !== undefined) {
       if (isAsync(config.onBeforeStepTransition)) {
@@ -132,7 +159,8 @@ export function useFlowManager(config: FlowConfig) {
      */
     createLiveSession({
       sessionDetails: {
-        instructions: "You are a helpful AI assistant.",
+        instructions:
+          config.globalInstructions || "You are a helpful AI assistant.",
         voice: "alloy",
         turnDetectionSilenceDuration: 1000,
       },
@@ -164,7 +192,11 @@ export function useFlowManager(config: FlowConfig) {
   };
 
   function getInstructions(stepInstructions: string) {
-	console.log('stepsRef.current[currentStepIndex].label', stepsRef.current[currentStepIndex].label)
+    console.log(
+      "stepsRef.current[currentStepIndex].label",
+      stepsRef.current[currentStepIndex].label
+    );
+
     // Create base instruction that explains the flow context
     const baseInstruction = `You are part of a multi-step conversation flow. Here's the context:
 				- Total steps: ${stepsRef.current.length}
@@ -180,6 +212,10 @@ export function useFlowManager(config: FlowConfig) {
 				Crucial instructions:
 				1. Focus on the current step's instructions and context, try to achieve the goal of the current step as soon as possible.
 				2. when you achieve the goal of the current step, use the transitionToStep function with the appropriate step label.
+        3. stay a bit discriptive about the current step, but don't be too verbose.
+
+        General goal or instructions: 
+        ${config.globalInstructions}
 			`;
 
     return `${baseInstruction}\n\n${stepInstructions}`;
