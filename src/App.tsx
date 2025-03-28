@@ -8,22 +8,11 @@ import { MemoryRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AiRaw } from "./pages/AiRaw";
 import { AiAssistant } from "./pages/AiAssistant";
 import { AiFlow } from "./pages/AiFlow";
-import { Config } from "./bootstrap/_init";
 import { useAtom } from "jotai";
-import { selectedFlowAtom } from "./store/atoms";
+import { selectedFlowAtom, configurationAtom } from "./store/atoms";
 import { flows } from "./flows";
-
-// Declare the global apika interface
-declare global {
-  interface Window {
-    apika: {
-      show: () => void;
-      hide: () => void;
-      init: (options: any) => void;
-      open: ((config: Config) => void) | null;
-    };
-  }
-}
+import {useApikaInitializer} from "./hooks/useApikaInitializer";
+import {MainButton} from "./components/shared/MainButton";
 
 // FlowSelector component
 const FlowSelector: React.FC = () => {
@@ -47,30 +36,10 @@ const FlowSelector: React.FC = () => {
 export function App() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
-  //Expose the open function to the global apika object
-  const open = (config: Config) => {
-    console.log("Opening APIKA with config:", config);
-    setIsAssistantOpen(true);
-  };
+  useApikaInitializer(setIsAssistantOpen);
 
-  const hide = () => {
-    setIsAssistantOpen(false);
-  };
-
-  // Connect to the global apika object
-  useEffect(() => {
-    // Dispatch event with the setter function
-    const event = new CustomEvent("APIKA_READY", {
-      detail: { setIsAssistantOpen },
-    });
-    window.dispatchEvent(event);
-
-    // Allow direct calls from parent window
-    if (window.apika) {
-      window.apika.open = open;
-      window.apika.hide = hide;
-    }
-  }, []);
+  const [config] = useAtom(configurationAtom);
+  const {devMode} = config;
 
   return (
     <JotaiProvider>
@@ -85,47 +54,63 @@ export function App() {
               element={
                 <>
                   <div className="flex flex-col items-center justify-center min-h-screen">
-                    <nav className="w-full p-4">
-                      <div className="container mx-auto flex justify-center space-x-4">
-                        <Link to="/ai-raw" className=" hover:text-gray-700">
-                          AI Raw
-                        </Link>
-                        <Link to="/ai-flow" className=" hover:text-gray-700">
-                          AI Flow
-                        </Link>
-                        <Link
-                          to="/ai-assistant"
-                          className=" hover:text-gray-700"
-                        >
-                          AI Assistant
-                        </Link>
+                    {devMode ? (
+                      <div
+                        className="max-w-[500px] min-h-fit border border-gray-300 rounded-lg shadow-sm p-6 bg-white pointer-events-auto">
+                        <nav className="w-full p-4">
+                          <div className="container mx-auto flex justify-center space-x-4">
+                            <Link to="/ai-raw" className=" hover:text-gray-700">
+                              AI Raw
+                            </Link>
+                            <Link
+                              to="/ai-flow"
+                              className=" hover:text-gray-700"
+                            >
+                              AI Assistant Flow 01
+                            </Link>
+                            <Link
+                              to="/ai-assistant"
+                              className=" hover:text-gray-700"
+                            >
+                              AI Assistant
+                            </Link>
+                          </div>
+                          <div className="flex justify-center mt-4">
+                            <FlowSelector />
+                          </div>
+                        </nav>
+                        <header className="app-header flex flex-col items-center justify-center">
+                          <h1 className={"text-blue-500"}>
+                            Welcome to AI Virtual Assistant Demo!
+                          </h1>
+                          <p>Click on the button to start APIKA!</p>
+                          <Button
+                            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4`}
+                            onClick={() => setIsAssistantOpen(true)}
+                          >
+                            Start Assistant
+                          </Button>
+                        </header>
                       </div>
-                      <div className="flex justify-center mt-4">
-                        <FlowSelector />
-                      </div>
-                    </nav>
-                    <header className="app-header flex flex-col items-center justify-center">
-                      <h1 className={"text-blue-500"}>
-                        Welcome to AI Virtual Assistant Demo!
-                      </h1>
-                      <p>Click on the button to start APIKA!</p>
-                      <Button
-                        className="mt-4"
-                        onClick={() => setIsAssistantOpen(true)}
+                    ):(
+                      <MainButton
+                        isAssistantOpen={isAssistantOpen}
+                        setIsAssistantOpen={setIsAssistantOpen}
+                      />
+                    )}
+                    {isAssistantOpen && (
+                      <div
+                        className={twMerge(
+                          "transition-opacity duration-300 pointer-events-auto",
+                          "opacity-100"
+                        )}
                       >
-                        Start Assistant
-                      </Button>
-                      {isAssistantOpen && (
-                        <div
-                          className={twMerge(
-                            "transition-opacity duration-300",
-                            "opacity-100"
-                          )}
-                        >
-                          <Assistant className="opacity-100" />
-                        </div>
-                      )}
-                    </header>
+                        <Assistant
+                          className="opacity-100"
+                          onClose={() => setIsAssistantOpen(false)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </>
               }

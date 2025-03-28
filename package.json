@@ -22,9 +22,12 @@
         "docker:local:build": "docker-compose --profile dev build --no-cache",
         "docker:local:up": "docker-compose --profile dev up",
         "docker:prod:build": "docker-compose build --no-cache",
-        "docker:prod:up": "NODE_ENV=production docker-compose --profile production up --build backend"
+        "docker:prod:up": "NODE_ENV=production docker-compose --profile production up --build backend",
+        "gitlab:build": "docker build --build-arg APIKA_APP_URL=${APIKA_APP_URL:-http://localhost:8080} -t apika:local .",
+        "gitlab:run": "docker run -p 8080:8080 apika:local"
     },
     "dependencies": {
+        "@iconify-icon/react": "^2.3.0",
         "jotai": "^2.12.2",
         "lucide-react": "^0.483.0",
         "react": "^19.0.0",

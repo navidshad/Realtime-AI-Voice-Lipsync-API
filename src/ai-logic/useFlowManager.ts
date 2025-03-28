@@ -164,6 +164,7 @@ export function useFlowManager(config: FlowConfig) {
   };
 
   function getInstructions(stepInstructions: string) {
+	console.log('stepsRef.current[currentStepIndex].label', stepsRef.current[currentStepIndex].label)
     // Create base instruction that explains the flow context
     const baseInstruction = `You are part of a multi-step conversation flow. Here's the context:
 				- Total steps: ${stepsRef.current.length}
