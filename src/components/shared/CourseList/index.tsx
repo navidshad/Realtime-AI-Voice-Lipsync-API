@@ -1,5 +1,5 @@
 import React from "react";
-import CourseCard from "../CourseDetails/CourseCard";
+import CourseCard from "./CourseCard";
 import { Course } from "../types";
 import MotionDiv from "../../unit/motion";
 

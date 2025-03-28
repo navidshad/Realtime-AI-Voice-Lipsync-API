@@ -190,11 +190,17 @@ const FlowHimanshu: Flow = (setActiveScene) => [
           console.log(`API CALL: ${category}`, response);
           const data = response?.courses || [];
 
-          //@ts-ignore
-          setActiveScene({ type: "list", data });
+
+          setActiveScene({ type: "list", data: data as unknown as Course[] });
+          const aiData = data.map((course) => ({
+            id: course.id,
+            title: course.title,
+            tutors: course.tutors.map((tutor) => tutor.name),
+            difficultyLevel: course.difficulty_level,
+           }));
           return {
             success: true,
-            data,
+            data: aiData,
             messageToAI: `Courses for ${category} have been fetched and displayed as cards.`,
           };
         },
