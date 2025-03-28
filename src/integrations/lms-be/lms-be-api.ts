@@ -1,7 +1,6 @@
 import {CourseList, CourseSingle} from "./types";
-import {isLocalhost} from "../../constants";
 
-const baseUrl = `https://learn-api${isLocalhost && '.dev'}.kodekloud.com`
+const baseUrl = `https://learn-api.dev.kodekloud.com`
 
 // Function to convert keys from snake_case to camelCase
 const toCamelCase = (obj: any): any => {

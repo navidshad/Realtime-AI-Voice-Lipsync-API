@@ -3,7 +3,7 @@ import categories from "./categories.json";
 import { Course, CourseDetails } from "../components/shared/types";
 import { lmsBeApi } from "../integrations/lms-be/lms-be-api";
 
-const FlowHimanshu: Flow = (setActiveScene) => {
+const FlowFinalDemo: Flow = (setActiveScene) => {
   let selectedBroadCategory: string | undefined;
   let selectedCategory: string | undefined;
 
@@ -407,4 +407,4 @@ const FlowHimanshu: Flow = (setActiveScene) => {
   };
 };
 
-export default FlowHimanshu;
+export default FlowFinalDemo;
