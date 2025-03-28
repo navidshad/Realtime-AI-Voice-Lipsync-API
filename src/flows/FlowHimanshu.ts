@@ -172,7 +172,7 @@ const FlowHimanshu: Flow = (setActiveScene) => [
         definition: {
           type: "function",
           name: "fetchCourses",
-          description: "Fetch a list of courses based on a category.",
+          description: "Fetch a list of courses based on a category. As input, use always category name with case sensitive letters like 'Cloud'. You can serialize multiple categories like 'Cloud,Azure'.",
           parameters: {
             type: "object",
             properties: {
@@ -185,34 +185,11 @@ const FlowHimanshu: Flow = (setActiveScene) => [
           },
         },
         handler: async ({ category }) => {
-            // https://learn-api.dev.kodekloud.com/api/courses?category=Automation
-          console.log(`Mock fetchCourses called with topic: ${category}`);
-          const data = [
-            {
-              id: "course-1", 
-              title: `Intro to ${category}`,
-              thumbnailUrl: "https://placekitten.com/300/200",
-              tutors: ["John Doe", "Jane Smith"],
-              plan: "Free",
-              difficultyLevel: "Beginner"
-            },
-            {
-              id: "course-2",
-              title: `${category} Advanced`,
-              thumbnailUrl: "https://placekitten.com/300/201", 
-              tutors: ["Alice Johnson"],
-              plan: "Pro",
-              difficultyLevel: "Advanced"
-            },
-            {
-              id: "course-3",
-              title: `${category} Hands-On Projects`,
-              thumbnailUrl: "https://placekitten.com/300/202",
-              tutors: ["Bob Wilson", "Carol Taylor"],
-              plan: "Pro",
-              difficultyLevel: "Intermediate"
-            }
-          ] as Course[];
+          const response = await lmsBeApi.getCoursesByCategories([category]);
+          console.log(`API CALL: ${category}`, response);
+          const data = response?.courses || [];
+
+          //@ts-ignore
           setActiveScene({ type: "list", data });
           return {
             success: true,
@@ -258,18 +235,31 @@ const FlowHimanshu: Flow = (setActiveScene) => [
           },
         },
         handler: async ({ courseId }) => {
-          console.log(
-            `Mock fetchCourseDetails called with courseId: ${courseId}`
-          );
+          const response = await lmsBeApi.getCourse(courseId);
+          console.log(`API CALL course id: ${courseId}`, response);
+
+          // Convert minutes to hours and format duration string
+          //@ts-ignore
+          const durationInMinutes = response?.includesSection?.courseDuration || 0;
+          const hours = Math.floor(durationInMinutes / 60);
+          const minutes = durationInMinutes % 60;
+          const formattedDuration = hours > 0
+            ? minutes > 0
+              ? `${hours} hour${hours > 1 ? 's' : ''} ${minutes} min`
+              : `${hours} hour${hours > 1 ? 's' : ''}`
+            : `${minutes} min`;
+
           const data: CourseDetails = {
             id: courseId,
-            title: "Mock Course Title", 
-            description: "This is a detailed description of the selected course.",
-            duration: "6 hours",
-            difficultyLevel: "Intermediate",
-            tutors: ["John Doe", "Jane Smith"],
-            plan: "Premium",
-            thumbnailUrl: "/images/mock-course.jpg"
+            title: response?.title || "Course Title",
+            description: response?.description || "No description available",
+            duration: formattedDuration,
+            //@ts-ignore
+            difficultyLevel: response?.difficultyLevel || "Intermediate",
+            tutors: response?.tutors?.map(tutor => tutor.name) || [],
+            plan: response?.plan || "Free",
+            //@ts-ignore
+            thumbnailUrl: response?.thumbnailUrl
           };
           setActiveScene({ type: "details", data });
           return {

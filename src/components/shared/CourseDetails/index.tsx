@@ -1,6 +1,7 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
 import { type CourseDetails } from "../types";
+import {markdownToHtml} from "../../../utils/markdown-to-html";
 
 type CourseDetailsCardProps = {
   course: CourseDetails;
@@ -32,7 +33,9 @@ const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
       <div className={"rounded-b-2.5xl p-6 text-gray-900"}>
         <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg font-semibold">{course.title}</p>
         
-        <p className="mb-4 text-sm text-gray-600 line-clamp-3">{course.description}</p>
+        <p className="mb-4 text-sm text-gray-600 line-clamp-3"
+           dangerouslySetInnerHTML={{__html: markdownToHtml(course.description)}}
+        />
 
         <div className="mt-4 space-y-2 text-xs">
           {course.tutors && (
