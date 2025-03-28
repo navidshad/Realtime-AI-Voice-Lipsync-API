@@ -10,7 +10,7 @@ type CourseListProps = {
 
 const CourseList: React.FC<CourseListProps> = ({ courses, onSelect }) => {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-4 justify-center items-center">
       {courses.map((course, index) => (
         <MotionDiv key={course.id} index={index}>
           <CourseCard key={course.id} course={course} onSelect={onSelect} />

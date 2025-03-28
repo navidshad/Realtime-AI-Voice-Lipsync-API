@@ -1,7 +1,7 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
 import { type CourseDetails } from "../types";
-import {markdownToHtml} from "../../../utils/markdown-to-html";
+import { markdownToHtml } from "../../../utils/markdown-to-html";
 
 type CourseDetailsCardProps = {
   course: CourseDetails;
@@ -10,13 +10,13 @@ type CourseDetailsCardProps = {
 
 const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
   return (
-    <div className="flex flex-col rounded-2.5xl shadow-card">
-      <header className="relative h-64 overflow-hidden rounded-t-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
+    <div className="flex flex-col max-w-3xl shadow-lg rounded-3xl overflow-hidden mx-auto animate-fade-in">
+      <header className="relative h-64 overflow-hidden rounded-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
         {course.thumbnailUrl && (
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="relative h-full w-full object-contain object-right-bottom"
+            className="relative h-full w-full object-cover"
           />
         )}
 
@@ -27,48 +27,63 @@ const CourseDetailsCard: React.FC<CourseDetailsCardProps> = ({ course }) => {
             </span>
           )}
         </div>
-
       </header>
 
       <div className={"rounded-b-2.5xl p-6 text-gray-900"}>
-        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg font-semibold">{course.title}</p>
-        
-        <p className="mb-4 text-sm text-gray-600 line-clamp-3"
-           dangerouslySetInnerHTML={{__html: markdownToHtml(course.description)}}
+        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg">
+          {course.title}
+        </p>
+
+        <p
+          className="mb-4 text-sm text-gray-600 line-clamp-3"
+          dangerouslySetInnerHTML={{
+            __html: markdownToHtml(course.description),
+          }}
         />
 
-        <div className="mt-4 space-y-2 text-xs">
+        <div className="mt-6 text-xs">
           {course.tutors && (
-            <p className="mb-2">
-              <span className="font-medium">Tutors:</span> {course.tutors.join(", ")}
-            </p>
+            <div className="flex justify-between mb-2">
+              <div>Tutors: </div>
+              <div>{course.tutors.join(", ")}</div>
+            </div>
           )}
+
           {course.difficultyLevel && (
-            <p>
-              <span className="font-medium">Level:</span> {course.difficultyLevel}
-            </p>
+            <div className="flex justify-between mb-2">
+              <div>Level: </div>
+              <div>{course.difficultyLevel}</div>
+            </div>
           )}
+
           {course.duration && (
-            <p>
-              <span className="font-medium">Duration:</span> {course.duration}
-            </p>
+            <div className="flex justify-between mb-2">
+              <div>Duration: </div>
+              <div>{course.duration}</div>
+            </div>
           )}
+
           {course.id && (
-            <p>
-              <span className="font-medium">Course ID:</span> {course.id}
-            </p>
+            <div className="flex justify-between mb-2">
+              <div>Course ID: </div>
+              <div>{course.id}</div>
+            </div>
           )}
         </div>
 
-        <button
-          onClick={() => null}
-          className={twMerge(
-            "mt-6 w-full py-2.75",
-            "btn-primary"
-          )}
-        >
+        <div className="flex justify-center w-full my-3 pt-4">
+          <button
+            onClick={() =>
+              window.open(
+                `https://learn.dev.kodekloud.com/user/courses/${course.slug}`,
+                "_blank"
+              )
+            }
+            className="mt-3 w-full py-2.75 bg-blue-500 text-white max-w-xl rounded-3xl font-bold bg-gradient-button cursor-pointer"
+          >
             Start Learning
-        </button>
+          </button>
+        </div>
       </div>
     </div>
   );

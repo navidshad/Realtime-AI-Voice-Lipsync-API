@@ -5,6 +5,7 @@ export type Course = {
   tutors?: string[];
   plan?: string;
   difficultyLevel?: string;
+  slug?: string;
 };
 
 
@@ -17,4 +18,5 @@ export type CourseDetails = {
     tutors?: string[];
     plan?: string;
     difficultyLevel?: string;
+    slug?: string;
 }

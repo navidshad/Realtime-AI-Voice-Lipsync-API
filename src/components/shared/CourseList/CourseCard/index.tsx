@@ -50,8 +50,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
         </div>
 
         <button
-          onClick={() => null}
-          className={twMerge("mt-3 w-full py-2.75 bg-blue-500 text-white rounded-3xl font-bold bg-gradient-button")}
+          onClick={() =>
+            window.open(
+              `https://learn.dev.kodekloud.com/user/courses/${course.slug}`,
+              "_blank"
+            )
+          }
+          className="mt-3 w-full py-2.75 bg-blue-500 text-white rounded-3xl font-bold bg-gradient-button cursor-pointer"
         >
           Start Learning
         </button>

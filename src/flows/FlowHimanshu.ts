@@ -329,7 +329,6 @@ const FlowHimanshu: Flow = (setActiveScene) => {
                     ? `${hours} hour${hours > 1 ? "s" : ""} ${minutes} min`
                     : `${hours} hour${hours > 1 ? "s" : ""}`
                   : `${minutes} min`;
-
               const data: CourseDetails = {
                 id: courseId,
                 title: response?.title || "Course Title",
@@ -342,12 +341,20 @@ const FlowHimanshu: Flow = (setActiveScene) => {
                 plan: response?.plan || "Free",
                 //@ts-ignore
                 thumbnailUrl: response?.thumbnailUrl,
+                slug: response?.slug,
               };
               setActiveScene({ type: "details", data });
+              const AI_DATA = data;
+              if (AI_DATA.slug) {
+                delete AI_DATA.slug;
+              }
+              if (AI_DATA.thumbnailUrl) {
+                delete AI_DATA.thumbnailUrl;
+              }
               return {
                 success: true,
                 messageToAI: `This is the data. Explain in a natural conversation way only.`,
-                data,
+                data: AI_DATA,
               };
             },
           },

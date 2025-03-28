@@ -64,7 +64,7 @@ export const Assistant = ({ className = "", isReady = false, onClose }: Assistan
           </svg>
         </button>
 
-        <div className="flex-1 h-full">
+        <div className="flex-1 h-full mt-8">
           <SceneModule
             toggleMicrophone={toggleMicrophone}
             isMicrophoneMuted={isMicrophoneMuted}
