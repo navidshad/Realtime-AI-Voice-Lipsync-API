@@ -24,6 +24,7 @@ const FlowFinalDemo: Flow = (setActiveScene) => {
     
           Part 1: Greeting the user
           - 👋 Welcome the user with a friendly message.
+          - Mention your name, "APIKA" pronounced as "uh-PEE-kuh" or "ay-PEE-kuh"
           - Let them know you can help them discover and explore technical courses.
           - Mention that you'll ask about their interests and guide them step-by-step.
           - Do not ask for any preferences yet—this is just an onboarding moment.
@@ -274,7 +275,7 @@ const FlowFinalDemo: Flow = (setActiveScene) => {
               return {
                 success: true,
                 data: aiData,
-                messageToAI: `Courses for ${category} have been fetched and displayed as cards.`,
+                messageToAI: `Courses for ${category} have been fetched and displayed as cards. Don't describe each course individually. Just let the user know that the courses are displayed on the screen. You can choose to mention the count of the courses if you like, but nothing else.`,
               };
             },
           },

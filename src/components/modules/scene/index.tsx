@@ -5,6 +5,7 @@ import { ConversationDialog } from "../../../ai-logic/types";
 import { AudioVisualizer } from "../../unit";
 import { SceneManager } from "../../../hooks/useSceneManager";
 import { markdownToHtml } from "../../../utils/markdown-to-html";
+import CourseList from "../../shared/CourseList";
 
 const SceneModule: React.FC<{
   toggleMicrophone: () => void;
@@ -21,11 +22,10 @@ const SceneModule: React.FC<{
   const renderMessage = (message: ConversationDialog) => {
     return (
       <div className="w-full h-full space-y-4 flex flex-col justify-between">
-        <div className="w-full flex-1">{sceneManager.renderScene()}
-        </div>
+        <div className="w-full flex-1">{sceneManager.renderScene()}</div>
         {sceneManager.activeScene === "none" && (
           <div className="flex justify-center items-center p-6 pb-0">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 inline-block max-w-3xl">
+            <div className="rounded-2xl p-6 inline-block max-w-3xl">
               <div
                 id="apika-text-area"
                 className="text-lg text-gray-800 leading-relaxed animate-fade-in whitespace-pre-wrap"

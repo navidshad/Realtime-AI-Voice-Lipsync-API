@@ -105,8 +105,14 @@ body {
 }
 
 .bg-gradient-button {
-    background-image: linear-gradient(0deg, rgb(0 0 0 / 7%), rgb(0 0 0 / 7%)),
-      linear-gradient(81.93deg, #1ea7f5 0%, #29ddff 100%);
+    transition: background-image 0.3s ease-in-out, color 0.3s ease-in-out;
+    &:hover {
+      background-image: linear-gradient(0deg, rgb(0 0 0 / 7%), rgb(0 0 0 / 7%)),
+        linear-gradient(81.93deg, #1ea7f5 0%, #29ddff 30%);
+      color: white;
+    }
+    background-image: none;
+    color: gray;
   }
 
   @layer components {

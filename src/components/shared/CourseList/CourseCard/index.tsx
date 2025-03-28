@@ -56,9 +56,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
               "_blank"
             )
           }
-          className="mt-3 w-full py-2.75 bg-blue-500 text-white rounded-3xl font-bold bg-gradient-button cursor-pointer"
+          className="mt-3 w-full py-2.75 rounded-3xl font-bold bg-gradient-button cursor-pointer transition-all"
         >
-          Start Learning
+          Explore Now
         </button>
       </div>
     </div>
