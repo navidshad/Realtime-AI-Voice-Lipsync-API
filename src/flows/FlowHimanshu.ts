@@ -1,6 +1,7 @@
 import { Flow } from "./types";
 import categories from "./categories.json";
 import { Course, CourseDetails } from "../components/shared/types";
+import { lmsBeApi } from "../integrations/lms-be/lms-be-api";
 
 const FlowHimanshu: Flow = (setActiveScene) => [
   {
