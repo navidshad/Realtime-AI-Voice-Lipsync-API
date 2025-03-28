@@ -232,7 +232,6 @@ export function useLiveSessionManager() {
     if (!sessionToolsRef.current || !dataChannelRef.current) return;
 
     const [output01] = eventData.response.output;
-    console.log("Function call", output01);
 
     const functionName = output01.name as string;
     const args = JSON.parse(output01.arguments);

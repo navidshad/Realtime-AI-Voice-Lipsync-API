@@ -1,4 +1,6 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
+import { Icon } from "@iconify-icon/react";
 
 type Course = {
   id: string;
@@ -8,6 +10,13 @@ type Course = {
   duration?: string;
   syllabus?: string[];
   highlights?: string[];
+  thumbnailUrl?: string;
+  thumbnailVideoUrl?: string;
+  progress?: number;
+  isEnrolled?: boolean;
+  tutors?: string[];
+  plan?: string;
+  difficultyLevel?: string;
 };
 
 type CourseCardProps = {
@@ -16,46 +25,52 @@ type CourseCardProps = {
 };
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
+
   return (
-    <div
-      className="border border-gray-300 rounded-2xl p-4 shadow-md hover:shadow-lg transition cursor-pointer"
-      onClick={() => onSelect?.(course.id)}
-    >
-      <h2 className="text-xl font-bold mb-1">{course.title}</h2>
-      <p className="text-sm text-gray-600 mb-2">{course.description}</p>
-
-      <div className="text-sm mb-2">
-        <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full mr-2">
-          Level: {course.level}
-        </span>
-        {course.duration && (
-          <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full">
-            Duration: {course.duration}
-          </span>
+    <div className="flex flex-col rounded-2.5xl shadow-card">
+      <header className="relative h-64 overflow-hidden rounded-t-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
+        {course.thumbnailUrl && (
+          <img
+            src={course.thumbnailUrl}
+            alt={course.title}
+            className="relative h-full w-full object-cover object-right-bottom"
+          />
         )}
+
+        <div className="absolute bottom-2 right-2 rounded-3xl py-1 text-xs text-white backdrop-blur backdrop-brightness-50">
+          {course.plan && (
+            <span className="rounded-3xl px-3 py-1 text-xs text-white backdrop-blur backdrop-brightness-100">
+              {course.plan}
+            </span>
+          )}
+        </div>
+
+      </header>
+
+      <div className={"rounded-b-2.5xl p-6 text-gray-900"}>
+        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg">{course.title}</p>
+        
+        <div className="mt-6 text-xs">
+          {course.tutors && (
+            <p className="mb-2">
+              Tutors: {course.tutors.join(", ")}
+            </p>
+          )}
+          {course.difficultyLevel && (
+            <p>Level: {course.difficultyLevel}</p>
+          )}
+        </div>
+
+        <button
+          onClick={() => null}
+          className={twMerge(
+            "mt-3 w-full py-2.75",
+            "btn-primary"
+          )}
+        >
+            Start Learning
+        </button>
       </div>
-
-      {course.syllabus && (
-        <div className="mt-2">
-          <h4 className="font-semibold text-sm mb-1">Syllabus:</h4>
-          <ul className="list-disc list-inside text-sm text-gray-700">
-            {course.syllabus.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {course.highlights && (
-        <div className="mt-2">
-          <h4 className="font-semibold text-sm mb-1">Highlights:</h4>
-          <ul className="list-disc list-inside text-sm text-gray-700">
-            {course.highlights.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

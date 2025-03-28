@@ -27,6 +27,7 @@
         "gitlab:run": "docker run -p 8080:8080 apika:local"
     },
     "dependencies": {
+        "@iconify-icon/react": "^2.3.0",
         "jotai": "^2.12.2",
         "lucide-react": "^0.483.0",
         "react": "^19.0.0",

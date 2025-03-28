@@ -41,7 +41,7 @@ export const useApika = () => {
     };
   }, []);
   const onUpdate = (eventData: any) => {
-    console.log("onUpdate", eventData);
+    // console.log("onUpdate", eventData);
   };
 
   return {

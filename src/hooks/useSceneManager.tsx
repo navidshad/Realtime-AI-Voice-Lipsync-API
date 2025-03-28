@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactElement } from "react";
 import CourseList from "../components/shared/CourseList";
 import CourseCard from "../components/shared/CourseCard";
+import CategoryList from "../components/shared/CategoryList";
 
 interface Course {
   id: string;
@@ -16,6 +17,7 @@ type SceneDataMap = {
   none: undefined;
   list: Course[];
   details: Course;
+  categories: string[];
 };
 
 type ActiveScene<T extends keyof SceneDataMap> = {
@@ -41,6 +43,10 @@ export const useSceneManager = (): SceneManagerReturnType => {
     data: undefined,
   });
 
+  useEffect(() => {
+    console.log('activeScene', activeScene);
+  }, [activeScene]);
+
   const renderScene = (): ReactElement | null => {
     if (activeScene.type === "list") {
       return (
@@ -49,6 +55,10 @@ export const useSceneManager = (): SceneManagerReturnType => {
           onSelect={(id) => null}
         />
       );
+    }
+
+    if (activeScene.type === "categories" && activeScene.data) {
+      return <CategoryList categories={activeScene.data as string[]} />;
     }
 
     if (activeScene.type === "details" && activeScene.data) {

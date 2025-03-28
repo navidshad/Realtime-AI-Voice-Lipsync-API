@@ -1,7 +1,7 @@
 import React, { useState, useRef, MouseEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import ChatModule from "./modules/chat";
-import ApikaModule from "./modules/apika";
+import SceneModule from "./modules/scene";
 import { useApika } from "../hooks/useApika";
 import ChatHistoryIcon from "./unit/chat-history-icon";
 
@@ -65,7 +65,7 @@ export const Assistant = ({ className = "", isReady = false, onClose }: Assistan
         </button>
 
         <div className="flex-1 h-full">
-          <ApikaModule
+          <SceneModule
             toggleMicrophone={toggleMicrophone}
             isMicrophoneMuted={isMicrophoneMuted}
             audioAnalyser={audioAnalyser}
