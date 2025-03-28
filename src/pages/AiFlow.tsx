@@ -17,7 +17,8 @@ export const AiFlow: React.FC = () => {
     isMicrophoneMuted,
     sessionStarted,
   } = useFlowManager({
-    steps: flows[selectedFlow](setActiveScene),
+    steps: flows[selectedFlow](setActiveScene).steps,
+    globalInstructions: flows[selectedFlow](setActiveScene).globalInstructions,
     onBeforeStepTransition: async (step) => {
       console.log("onBeforeStepTransition async", step);
       return Promise.resolve();

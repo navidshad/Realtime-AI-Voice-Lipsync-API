@@ -74,7 +74,9 @@ export function useLiveSessionManager() {
       const session = await requestLiveSessionEphemeralToken({
         voice: sessionDetails.voice || "alloy",
         instructions: sessionDetails.instructions,
-        tools: Object.values(tools).filter(t => t !== undefined).map((t) => t.definition),
+        tools: Object.values(tools)
+          .filter((t) => t !== undefined)
+          .map((t) => t.definition),
         tool_choice: "auto",
         turn_detection: {
           type: "server_vad",
@@ -236,6 +238,8 @@ export function useLiveSessionManager() {
     const functionName = output01.name as string;
     const args = JSON.parse(output01.arguments);
 
+    console.log("function call", functionName, args);
+
     const fn = sessionToolsRef.current[functionName];
     const fnHandler = fn?.handler as AiToolHandler;
     let fnResponse: AiToolResponse = { success: false };
@@ -261,7 +265,7 @@ export function useLiveSessionManager() {
       }
     }
 
-    console.log("Function call response", fnResponse);
+    console.log("Function call", functionName, "response", fnResponse);
 
     const response = {
       type: "conversation.item.create",
