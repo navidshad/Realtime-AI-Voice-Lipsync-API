@@ -107,16 +107,19 @@ const FlowHimanshu: Flow = (setActiveScene) => {
       },
       {
         label: "Step 2: Refine and Select Category",
-        instructions: `
+        instructions: (stepIndex) => {
+          const validCategories = categories[
+            selectedBroadCategory as keyof typeof categories
+          ].map((c: any) => c.name);
+          const validCategoriesString = validCategories.join(", ");
+
+          return `
             ✅ What to do:
-            - Call getListOfCategories **with the user's broad input** (from Step 1) as the 'broadCategory' parameter to retrieve the relevant list of valid categories
             - Wait for the user to select one exact category from the list rendered on the screen
             - If no selection is made, politely ask the user to pick one from the displayed list
             - If the user selects another broad or vague term that does not EXACTLY match a category from getListOfCategories, repeat this step from the beginning
     
             ⚠️ Important:
-            - NEVER guess categories - always retrieve the valid list first using getListOfCategories
-            - You MUST call getListOfCategories with the exact broadCategory from Step 1
             - You MUST NOT list, describe, or enumerate categories manually in your response
             - You MUST verify the user's selection against the returned list of valid categories
             - You MUST NOT proceed unless the selected category EXACTLY matches a category name from the list
@@ -124,13 +127,12 @@ const FlowHimanshu: Flow = (setActiveScene) => {
             - If user's selection is ambiguous or not an exact match, ask them to specifically choose one from the displayed list
     
             Goal:
-            - Only proceed once a valid, specific selection is made
-    
-            🧠 Examples:
-            User: "I'm into DevOps"
-            Assistant: "Great! Let me show you some options."
-            Assistant then calls getListOfCategories
-        `,
+            - to help user to select a valid category from the list
+
+            Valid categories:
+            ${validCategoriesString}
+        `;
+        },
         exitCondition: () => {
           if (selectedCategory === undefined) {
             return false;
@@ -138,43 +140,51 @@ const FlowHimanshu: Flow = (setActiveScene) => {
             return true;
           }
         },
+        onEnter: () => {
+          const filteredCategories =
+            categories[selectedBroadCategory as keyof typeof categories];
+          setActiveScene({
+            type: "categories",
+            data: filteredCategories.map((c: any) => c.name),
+          });
+        },
         tools: {
-          getListOfCategories: {
-            definition: {
-              type: "function",
-              name: "getListOfCategories",
-              description:
-                "Get the list of valid categories that the user must choose from, filtered by a broad category.",
-              parameters: {
-                type: "object",
-                properties: {
-                  broadCategory: {
-                    type: "string",
-                    description:
-                      "A broad or general category used to filter the list of valid categories",
-                  },
-                },
-                required: ["broadCategory"],
-              },
-            },
-            handler: ({
-              broadCategory,
-            }: {
-              broadCategory: keyof typeof categories;
-            }) => {
-              // Simple filter logic based on inclusion of the broadCategory string
-              const filteredCategories = categories[broadCategory];
-              setActiveScene({
-                type: "categories",
-                data: filteredCategories.map((c) => c.name),
-              });
-              return {
-                success: true,
-                data: filteredCategories,
-                messageToAI: `Filtered categories based on "${broadCategory}" are on the screen.`,
-              };
-            },
-          },
+          // getListOfCategories: {
+          //   definition: {
+          //     type: "function",
+          //     name: "getListOfCategories",
+          //     description:
+          //       "Get the list of valid categories that the user must choose from, filtered by a broad category.",
+          //     parameters: {
+          //       type: "object",
+          //       properties: {
+          //         broadCategory: {
+          //           type: "string",
+          //           description:
+          //             "A broad or general category used to filter the list of valid categories",
+          //         },
+          //       },
+          //       required: ["broadCategory"],
+          //     },
+          //   },
+          //   handler: ({
+          //     broadCategory,
+          //   }: {
+          //     broadCategory: keyof typeof categories;
+          //   }) => {
+          //     // Simple filter logic based on inclusion of the broadCategory string
+          //     const filteredCategories = categories[broadCategory];
+          //     setActiveScene({
+          //       type: "categories",
+          //       data: filteredCategories.map((c) => c.name),
+          //     });
+          //     return {
+          //       success: true,
+          //       data: filteredCategories,
+          //       messageToAI: `Filtered categories based on "${broadCategory}" are on the screen.`,
+          //     };
+          //   },
+          // },
           selectCategory: {
             definition: {
               type: "function",
@@ -201,34 +211,6 @@ const FlowHimanshu: Flow = (setActiveScene) => {
               }
             },
           },
-          // renderListOnScreen: {
-          //   definition: {
-          //     type: "function",
-          //     name: "renderListOnScreen",
-          //     description:
-          //       "Render a list of items (like categories) as interactive UI elements instead of listing them manually.",
-          //     parameters: {
-          //       type: "object",
-          //       properties: {
-          //         items: {
-          //           type: "array",
-          //           items: { type: "string" },
-          //           description: "Array of items to show the user",
-          //         },
-          //       },
-          //       required: ["items"],
-          //     },
-          //   },
-          //   handler: async ({ items }) => {
-          //     setActiveScene({ type: "categories", data: items });
-          //     return {
-          //       success: true,
-          //       messageToAI:
-          //         "The list has been rendered for the user to pick from. Wait for a valid selection.",
-          //       data: items,
-          //     };
-          //   },
-          // },
         },
       },
       {

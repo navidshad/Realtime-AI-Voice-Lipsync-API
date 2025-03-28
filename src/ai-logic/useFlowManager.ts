@@ -5,7 +5,7 @@ import { isAsync } from "./utils";
 
 export type ConversationStep = {
   label: string;
-  instructions: string;
+  instructions: string | ((stepIndex: number) => string);
   tools?: AiTools;
   onEnter?: () => void;
   exitCondition?: () => boolean;
@@ -159,9 +159,8 @@ export function useFlowManager(config: FlowConfig) {
      */
     createLiveSession({
       sessionDetails: {
-        instructions:
-          config.globalInstructions || "You are a helpful AI assistant.",
-        voice: "alloy",
+        instructions: "You are a helpful AI assistant.",
+        voice: "shimmer",
         turnDetectionSilenceDuration: 1000,
       },
       tools: {}, // Add your tools here
@@ -191,7 +190,9 @@ export function useFlowManager(config: FlowConfig) {
     });
   };
 
-  function getInstructions(stepInstructions: string) {
+  function getInstructions(
+    stepInstructions: string | ((stepIndex: number) => string)
+  ) {
     console.log(
       "stepsRef.current[currentStepIndex].label",
       stepsRef.current[currentStepIndex].label
@@ -218,7 +219,12 @@ export function useFlowManager(config: FlowConfig) {
         ${config.globalInstructions}
 			`;
 
-    return `${baseInstruction}\n\n${stepInstructions}`;
+    const preparedStepInstructions =
+      typeof stepInstructions === "function"
+        ? stepInstructions(currentStepIndex)
+        : stepInstructions;
+
+    return `${baseInstruction}\n\n${preparedStepInstructions}`;
   }
 
   // Get current step
