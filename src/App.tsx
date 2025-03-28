@@ -13,6 +13,7 @@ import { selectedFlowAtom, configurationAtom } from "./store/atoms";
 import { flows } from "./flows";
 import {useApikaInitializer} from "./hooks/useApikaInitializer";
 import {MainButton} from "./components/shared/MainButton";
+import {AiCharacter} from "./pages/AiCharacter";
 
 // FlowSelector component
 const FlowSelector: React.FC = () => {

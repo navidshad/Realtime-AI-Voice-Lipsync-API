@@ -107,6 +107,7 @@ export const AiCharacter: React.FC = () => {
 
   return (
     <div
+      className={"pointer-events-auto"}
       style={{
         position: "relative",
         height: "100vh",
