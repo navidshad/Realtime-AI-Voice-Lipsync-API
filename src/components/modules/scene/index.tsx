@@ -4,6 +4,8 @@ import { conversationDialogsAtom } from "../../../store/atoms";
 import { ConversationDialog } from "../../../ai-logic/types";
 import { AudioVisualizer } from "../../unit";
 import { SceneManager } from "../../../hooks/useSceneManager";
+import {markdownToHtml} from "../../../utils/markdown-to-html";
+import CourseList from "../../shared/CourseList";
 
 const SceneModule: React.FC<{
   toggleMicrophone: () => void;
@@ -25,9 +27,11 @@ const SceneModule: React.FC<{
         </div>
         <div className="flex justify-center items-center p-6 pb-0">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 inline-block max-w-3xl">
-            <div className="text-lg text-gray-800 leading-relaxed animate-fade-in whitespace-pre-wrap">
-              {message.content}
-            </div>
+            <div
+              id="apika-text-area"
+              className="text-lg text-gray-800 leading-relaxed animate-fade-in whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: markdownToHtml(message.content) }}
+            />
           </div>
         </div>
       </div>

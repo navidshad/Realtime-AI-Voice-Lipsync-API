@@ -1,6 +1,7 @@
 import { Flow } from "./types";
 import categories from "./categories.json";
-import { useState } from "react";
+import { Course, CourseDetails } from "../components/shared/types";
+import { lmsBeApi } from "../integrations/lms-be/lms-be-api";
 
 const FlowHimanshu: Flow = (setActiveScene) => {
   let selectedBroadCategory: string | undefined;
@@ -216,29 +217,30 @@ const FlowHimanshu: Flow = (setActiveScene) => {
       {
         label: "Step 3: Show Relevant Courses",
         instructions: `
-          ✅ Use the exact category name validated in Step 1.
+          :white_check_mark: Use the exact category name validated in Step 1.
     
           1. Call fetchCourses with the EXACT category name
           2. Wait for the UI to display course cards
           3. Wait for user's selection
     
-          ⚠️ STRICT RULES:
+          :warning: STRICT RULES:
           - DO NOT list, describe, paraphrase or format course data
           - DO NOT use markdown, bullet points or alter the category name
     
-          ✅ INSTEAD:
+          :white_check_mark: INSTEAD:
           - Simply call fetchCourses tool with the exact category name
           - UI will render the cards
           - Wait for user interaction to proceed
     
-          🔁 If user wants to change interest, go back to Step 1.
+          :repeat: If user wants to change interest, go back to Step 1.
         `,
         tools: {
           fetchCourses: {
             definition: {
               type: "function",
               name: "fetchCourses",
-              description: "Fetch a list of courses based on a category.",
+              description:
+                "Fetch a list of courses based on a category. As input, use always category name with case sensitive letters like 'Cloud'. You can serialize multiple categories like 'Cloud,Azure'.",
               parameters: {
                 type: "object",
                 properties: {
@@ -251,32 +253,25 @@ const FlowHimanshu: Flow = (setActiveScene) => {
               },
             },
             handler: async ({ category }) => {
-              // https://learn-api.dev.kodekloud.com/api/courses?category=Automation
-              console.log(`Mock fetchCourses called with topic: ${category}`);
-              const data = [
-                {
-                  id: "course-1",
-                  title: `Intro to ${category}`,
-                  description: `A beginner-friendly introduction to ${category}.`,
-                  level: "Beginner",
-                },
-                {
-                  id: "course-2",
-                  title: `${category} Advanced`,
-                  description: `An advanced course diving deep into ${category}.`,
-                  level: "Advanced",
-                },
-                {
-                  id: "course-3",
-                  title: `${category} Hands-On Projects`,
-                  description: `Practice ${category} through real-world projects.`,
-                  level: "Intermediate",
-                },
-              ];
-              setActiveScene({ type: "list", data });
+              const response = await lmsBeApi.getCoursesByCategories([
+                category,
+              ]);
+              console.log(`API CALL: ${category}`, response);
+              const data = response?.courses || [];
+
+              setActiveScene({
+                type: "list",
+                data: data as unknown as Course[],
+              });
+              const aiData = data.map((course) => ({
+                id: course.id,
+                title: course.title,
+                tutors: course.tutors.map((tutor) => tutor.name),
+                difficultyLevel: course.difficulty_level,
+              }));
               return {
                 success: true,
-                data,
+                data: aiData,
                 messageToAI: `Courses for ${category} have been fetched and displayed as cards.`,
               };
             },
@@ -286,19 +281,19 @@ const FlowHimanshu: Flow = (setActiveScene) => {
       {
         label: "Step 4: Course Deep Dive",
         instructions: `
-          ✅ When a user selects a course, fetch details using the Course Details API.
+          :white_check_mark: When a user selects a course, fetch details using the Course Details API.
     
-          ⚠️ RULES:
+          :warning: RULES:
           - DO NOT describe or paraphrase the course
           - DO NOT use formatting or generate bullet points
     
-          ✅ INSTEAD:
+          :white_check_mark: INSTEAD:
           - Call fetchCourseDetails with the selected courseId
           - UI will show the content
           - Wait for user's response on what to do next
     
-          🔁 If they want more courses, check if the interest is same, if yes go back to Step 3
-          🔁 If they want new topics or interests or categories go back to Step 1
+          :repeat: If they want more courses, check if the interest is same, if yes go back to Step 3
+          :repeat: If they want new topics or interests or categories go back to Step 1
         `,
         tools: {
           fetchCourseDetails: {
@@ -318,27 +313,35 @@ const FlowHimanshu: Flow = (setActiveScene) => {
               },
             },
             handler: async ({ courseId }) => {
-              console.log(
-                `Mock fetchCourseDetails called with courseId: ${courseId}`
-              );
-              const data = {
+              const response = await lmsBeApi.getCourse(courseId);
+              console.log(`API CALL course id: ${courseId}`, response);
+
+              // Convert minutes to hours and format duration string
+              //@ts-ignore
+              const durationInMinutes =
+                // @ts-ignore
+                response?.includesSection?.courseDuration || 0;
+              const hours = Math.floor(durationInMinutes / 60);
+              const minutes = durationInMinutes % 60;
+              const formattedDuration =
+                hours > 0
+                  ? minutes > 0
+                    ? `${hours} hour${hours > 1 ? "s" : ""} ${minutes} min`
+                    : `${hours} hour${hours > 1 ? "s" : ""}`
+                  : `${minutes} min`;
+
+              const data: CourseDetails = {
                 id: courseId,
-                title: "Mock Course Title",
+                title: response?.title || "Course Title",
                 description:
-                  "This is a detailed description of the selected course.",
-                level: "Intermediate",
-                duration: "6 hours",
-                syllabus: [
-                  "Module 1: Introduction",
-                  "Module 2: Core Concepts",
-                  "Module 3: Hands-On Labs",
-                  "Module 4: Final Project",
-                ],
-                highlights: [
-                  "100% hands-on",
-                  "Certificate of Completion",
-                  "Lifetime Access",
-                ],
+                  response?.description || "No description available",
+                duration: formattedDuration,
+                //@ts-ignore
+                difficultyLevel: response?.difficultyLevel || "Intermediate",
+                tutors: response?.tutors?.map((tutor) => tutor.name) || [],
+                plan: response?.plan || "Free",
+                //@ts-ignore
+                thumbnailUrl: response?.thumbnailUrl,
               };
               setActiveScene({ type: "details", data });
               return {
@@ -353,7 +356,7 @@ const FlowHimanshu: Flow = (setActiveScene) => {
       {
         label: "Step 5: Wrap Up",
         instructions: `
-          ✅ Wrap up the conversation politely.
+          :white_check_mark: Wrap up the conversation politely.
     
           - If user found a course or wants to leave → say goodbye and offer to return anytime
           - If they want more → ask if same interest → Step 3 or new one → Step 1

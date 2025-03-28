@@ -1,22 +1,13 @@
 import { useEffect, useState, type ReactElement } from "react";
 import CourseList from "../components/shared/CourseList";
-import CourseCard from "../components/shared/CourseCard";
 import CategoryList from "../components/shared/CategoryList";
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  syllabus?: string[];
-  highlights?: string[];
-}
+import { Course, CourseDetails } from "../components/shared/types";
+import CourseDetailsCard from "../components/shared/CourseDetails";
 
 type SceneDataMap = {
   none: undefined;
   list: Course[];
-  details: Course;
+  details: CourseDetails;
   categories: string[];
 };
 
@@ -62,7 +53,7 @@ export const useSceneManager = (): SceneManagerReturnType => {
     }
 
     if (activeScene.type === "details" && activeScene.data) {
-      return <CourseCard course={activeScene.data as Course} />;
+      return <CourseDetailsCard course={activeScene.data as CourseDetails} />;
     }
 
     return null; // or a welcome screen / loader

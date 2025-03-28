@@ -1,23 +1,6 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { Icon } from "@iconify-icon/react";
-
-type Course = {
-  id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  syllabus?: string[];
-  highlights?: string[];
-  thumbnailUrl?: string;
-  thumbnailVideoUrl?: string;
-  progress?: number;
-  isEnrolled?: boolean;
-  tutors?: string[];
-  plan?: string;
-  difficultyLevel?: string;
-};
+import { Course } from "../../types";
 
 type CourseCardProps = {
   course: Course;
@@ -25,15 +8,14 @@ type CourseCardProps = {
 };
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
-
   return (
-    <div className="flex flex-col rounded-2.5xl shadow-card">
-      <header className="relative h-64 overflow-hidden rounded-t-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
+    <div className="flex flex-col max-w-xs min-w-xs shadow-lg rounded-3xl overflow-hidden">
+      <header className="relative h-64 overflow-hidden rounded-2.5xl bg-slate-100 sm:h-60 lg:h-52 xl:h-48">
         {course.thumbnailUrl && (
           <img
             src={course.thumbnailUrl}
             alt={course.title}
-            className="relative h-full w-full object-cover object-right-bottom"
+            className="relative h-full w-full object-contain object-right-bottom"
           />
         )}
 
@@ -44,31 +26,34 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect }) => {
             </span>
           )}
         </div>
-
       </header>
 
       <div className={"rounded-b-2.5xl p-6 text-gray-900"}>
-        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg">{course.title}</p>
-        
+        <p className="mb-3.25 mt-1 line-clamp-2 h-12.5 text-lg">
+          {course.title}
+        </p>
+
         <div className="mt-6 text-xs">
           {course.tutors && (
-            <p className="mb-2">
-              Tutors: {course.tutors.join(", ")}
-            </p>
+            <div className="flex justify-between mb-2">
+              <div>Tutors: </div>
+              <div>{course.tutors.join(", ")}</div>
+            </div>
           )}
+
           {course.difficultyLevel && (
-            <p>Level: {course.difficultyLevel}</p>
+            <div className="flex justify-between mb-2">
+              <div>Level: </div>
+              <div>{course.difficultyLevel}</div>
+            </div>
           )}
         </div>
 
         <button
           onClick={() => null}
-          className={twMerge(
-            "mt-3 w-full py-2.75",
-            "btn-primary"
-          )}
+          className={twMerge("mt-3 w-full py-2.75 bg-blue-500 text-white rounded-3xl font-bold bg-gradient-button")}
         >
-            Start Learning
+          Start Learning
         </button>
       </div>
     </div>
