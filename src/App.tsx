@@ -11,9 +11,8 @@ import { AiFlow } from "./pages/AiFlow";
 import { useAtom } from "jotai";
 import { selectedFlowAtom, configurationAtom } from "./store/atoms";
 import { flows } from "./flows";
-import { useApikaInitializer } from "./hooks/useApikaInitializer";
-import { MainButton } from "./components/shared/MainButton";
-import { AiCharacter } from "./pages/AiCharacter";
+import {useApikaInitializer} from "./hooks/useApikaInitializer";
+import {MainButton} from "./components/shared/MainButton";
 
 // FlowSelector component
 const FlowSelector: React.FC = () => {
@@ -40,7 +39,7 @@ export function App() {
   useApikaInitializer(setIsAssistantOpen);
 
   const [config] = useAtom(configurationAtom);
-  const { devMode } = config;
+  const {devMode} = config;
 
   return (
     <JotaiProvider>
@@ -57,7 +56,8 @@ export function App() {
                 <>
                   <div className="flex flex-col items-center justify-center min-h-screen">
                     {devMode ? (
-                      <div className="max-w-[500px] min-h-fit border border-gray-300 rounded-lg shadow-sm p-6 bg-white pointer-events-auto">
+                      <div
+                        className="max-w-[500px] min-h-fit border border-gray-300 rounded-lg shadow-sm p-6 bg-white pointer-events-auto">
                         <nav className="w-full p-4">
                           <div className="container mx-auto flex justify-center space-x-4">
                             <Link to="/ai-raw" className=" hover:text-gray-700">
@@ -99,7 +99,7 @@ export function App() {
                           </Button>
                         </header>
                       </div>
-                    ) : (
+                    ):(
                       <MainButton
                         isAssistantOpen={isAssistantOpen}
                         setIsAssistantOpen={setIsAssistantOpen}

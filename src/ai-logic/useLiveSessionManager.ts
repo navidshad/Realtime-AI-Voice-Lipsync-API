@@ -1,6 +1,7 @@
 import { useAtom, useSetAtom } from "jotai";
 import { useRef } from "react";
 import {
+  liveSessionIdAtom,
   liveSessionAtom,
   sessionStartedAtom,
   conversationDialogsAtom,
@@ -11,6 +12,7 @@ import { isAsync, requestLiveSessionEphemeralToken } from "./utils";
 import {
   TokenUsage,
   LiveSession,
+  EphemeralToken,
   AiTools,
   AiToolResponse,
   AiToolHandler,
@@ -19,6 +21,7 @@ import { CustomMediaRecorder } from "../character/customMediaRecorder";
 
 export function useLiveSessionManager() {
   // State atoms
+  const [liveSessionId, setLiveSessionId] = useAtom(liveSessionIdAtom);
   const [liveSession, setLiveSession] = useAtom(liveSessionAtom);
   const [sessionStarted, setSessionStarted] = useAtom(sessionStartedAtom);
   const [conversationDialogs, setConversationDialogs] = useAtom(
@@ -82,6 +85,7 @@ export function useLiveSessionManager() {
       audioRef,
       onAiSoundStreamed,
     } = options;
+ 
 
     // Store the tools and callback
     sessionToolsRef.current = tools;
@@ -301,10 +305,11 @@ export function useLiveSessionManager() {
     if (!sessionToolsRef.current || !dataChannelRef.current) return;
 
     const [output01] = eventData.response.output;
-    console.log("Function call", output01);
 
     const functionName = output01.name as string;
     const args = JSON.parse(output01.arguments);
+
+    console.log("function call", functionName, args);
 
     const fn = sessionToolsRef.current[functionName];
     const fnHandler = fn?.handler as AiToolHandler;
@@ -331,7 +336,7 @@ export function useLiveSessionManager() {
       }
     }
 
-    console.log("Function call response", fnResponse);
+    console.log("Function call", functionName, "response", fnResponse);
 
     const response = {
       type: "conversation.item.create",

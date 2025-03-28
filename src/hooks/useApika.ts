@@ -18,12 +18,14 @@ export const useApika = () => {
     sessionStarted,
     microphoneTrackRef,
   } = useFlowManager({
-    steps: flows[currentActiveFlow](setActiveScene),
+    steps: flows[currentActiveFlow](setActiveScene).steps,
+    globalInstructions:
+      flows[currentActiveFlow](setActiveScene).globalInstructions,
     onBeforeStepTransition() {
-        setActiveScene({ 
-            type: "none",
-            data: undefined
-        });
+      setActiveScene({
+        type: "none",
+        data: undefined,
+      });
     },
   });
   const initializedRef = useRef(false);
@@ -41,7 +43,7 @@ export const useApika = () => {
     };
   }, []);
   const onUpdate = (eventData: any) => {
-    console.log("onUpdate", eventData);
+    // console.log("onUpdate", eventData);
   };
 
   return {

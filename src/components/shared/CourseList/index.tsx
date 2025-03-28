@@ -1,15 +1,7 @@
 import React from "react";
-import CourseCard from "../CourseCard";
-
-type Course = {
-  id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  syllabus?: string[];
-  highlights?: string[];
-};
+import CourseCard from "./CourseCard";
+import { Course } from "../types";
+import MotionDiv from "../../unit/motion";
 
 type CourseListProps = {
   courses: Course[];
@@ -18,9 +10,11 @@ type CourseListProps = {
 
 const CourseList: React.FC<CourseListProps> = ({ courses, onSelect }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {courses.map((course) => (
-        <CourseCard key={course.id} course={course} onSelect={onSelect} />
+    <div className="flex flex-wrap gap-4">
+      {courses.map((course, index) => (
+        <MotionDiv key={course.id} index={index}>
+          <CourseCard key={course.id} course={course} onSelect={onSelect} />
+        </MotionDiv>
       ))}
     </div>
   );

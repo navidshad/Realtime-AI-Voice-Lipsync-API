@@ -29,16 +29,6 @@ const isProduction = process.env.NODE_ENV === "production";
 //TODO: let's enable CORS in production too, temporarily (remove this later)
 app.use(cors());
 
-// Configure file upload middleware
-app.use(
-  fileUpload({
-    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file size
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-    createParentPath: true,
-  })
-);
-
 // API endpoints
 const apiRouter = express.Router();
 

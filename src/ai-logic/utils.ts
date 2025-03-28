@@ -19,9 +19,7 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
   try {
     const base64Data = window.btoa(JSON.stringify(additionalSetup));
 
-    const r = await fetch(
-      `${APIKA_SERVICE_URL}/api/get-token?` + "data=" + base64Data
-    );
+    const r = await fetch(`${APIKA_SERVICE_URL}/api/get-token?` + 'data=' + base64Data);
 
     if (r.status < 200 || r.status >= 299) {
       const body = await r.json();

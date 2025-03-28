@@ -1,21 +1,14 @@
 import { useEffect, useState, type ReactElement } from "react";
 import CourseList from "../components/shared/CourseList";
-import CourseCard from "../components/shared/CourseCard";
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  syllabus?: string[];
-  highlights?: string[];
-}
+import CategoryList from "../components/shared/CategoryList";
+import { Course, CourseDetails } from "../components/shared/types";
+import CourseDetailsCard from "../components/shared/CourseDetails";
 
 type SceneDataMap = {
   none: undefined;
   list: Course[];
-  details: Course;
+  details: CourseDetails;
+  categories: string[];
 };
 
 type ActiveScene<T extends keyof SceneDataMap> = {
@@ -41,6 +34,10 @@ export const useSceneManager = (): SceneManagerReturnType => {
     data: undefined,
   });
 
+  useEffect(() => {
+    console.log('activeScene', activeScene);
+  }, [activeScene]);
+
   const renderScene = (): ReactElement | null => {
     if (activeScene.type === "list") {
       return (
@@ -51,8 +48,12 @@ export const useSceneManager = (): SceneManagerReturnType => {
       );
     }
 
+    if (activeScene.type === "categories" && activeScene.data) {
+      return <CategoryList categories={activeScene.data as string[]} />;
+    }
+
     if (activeScene.type === "details" && activeScene.data) {
-      return <CourseCard course={activeScene.data as Course} />;
+      return <CourseDetailsCard course={activeScene.data as CourseDetails} />;
     }
 
     return null; // or a welcome screen / loader

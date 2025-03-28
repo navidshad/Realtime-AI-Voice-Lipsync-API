@@ -1,13 +1,13 @@
-import { APIKA_SERVICE_URL, isLocalhost } from "../constants";
-import { registerEventListener } from "../events/register-event-listener";
-import { ApikaEvent } from "../events/events.types";
-import { sendEvent } from "../events/send-event";
-import { Config, defaultConfig } from "../constants";
+import {APIKA_SERVICE_URL, isLocalhost} from "../constants";
+import {registerEventListener} from "../events/register-event-listener";
+import {ApikaEvent} from "../events/events.types";
+import {sendEvent} from "../events/send-event";
+import {Config, defaultConfig} from "../constants";
 
 let isLoaded = false;
 let isInitialized = false;
 
-let config: Config = {} as Config;
+let config: Config = {} as Config
 
 let shadowRoot: ShadowRoot | null = null;
 
@@ -15,23 +15,20 @@ let shadowRoot: ShadowRoot | null = null;
 const parseUrlParams = (): Partial<Config> => {
   const urlParams = new URLSearchParams(window.location.search);
   const configOverrides: Record<string, any> = {};
-
+  
   // Convert kebab-case URL params to camelCase config props
   Array.from(urlParams.entries()).forEach(([key, value]) => {
-    if (key.startsWith("apika-")) {
-      const configKey = key
-        .replace("apika-", "")
-        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-
+    if (key.startsWith('apika-')) {
+      const configKey = key.replace('apika-', '').replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      
       // Convert string values to proper types
-      if (value === "true") configOverrides[configKey] = true;
-      else if (value === "false") configOverrides[configKey] = false;
-      else if (!isNaN(Number(value)))
-        configOverrides[configKey] = Number(value);
+      if (value === 'true') configOverrides[configKey] = true;
+      else if (value === 'false') configOverrides[configKey] = false;
+      else if (!isNaN(Number(value))) configOverrides[configKey] = Number(value);
       else configOverrides[configKey] = value;
     }
   });
-
+  
   return configOverrides as Partial<Config>;
 };
 
@@ -47,12 +44,12 @@ const createShadowDOM = function () {
   // Create container
   const container = document.createElement("div");
   container.id = apikaContainerId;
-  container.style.display = "block";
-  container.style.position = "fixed";
-  container.style.zIndex = "99999";
-  container.style.top = "0";
-  container.style.left = "0";
-  // container.style.pointerEvents = "none";
+  container.style.display = 'block';
+  container.style.position = 'fixed';
+  container.style.zIndex = '99999';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.pointerEvents = 'none';
   document.body.appendChild(container);
 
   // Create shadow root
@@ -136,16 +133,16 @@ const loadScript = function () {
   });
 };
 
-const prepareConfig = function (userConfig = {}) {
+const prepareConfig = function(userConfig = {}) {
   const urlParamOverrides = parseUrlParams();
-
+  
   config = {
     ...defaultConfig,
-    ...(userConfig ?? {}),
-    ...urlParamOverrides, // URL params take highest precedence
+    ...userConfig ?? {},
+    ...urlParamOverrides // URL params take highest precedence
   } as Config;
-
-  console.log("Config prepared with URL overrides:", config);
+  
+  console.log('Config prepared with URL overrides:', config);
 };
 
 const apika = {
@@ -155,19 +152,19 @@ const apika = {
   close: () => {
     sendEvent(ApikaEvent.APIKA_CLOSE);
   },
-  init: function (userConfig: Config) {
+  init: function(userConfig: Config) {
     if (isInitialized) {
       return;
     }
-    isInitialized = true;
+    isInitialized = true
 
-    console.log("registering...");
+    console.log('registering...')
 
     registerEventListener(ApikaEvent.APIKA_READY, () => {
-      console.log("event listener callback");
+      console.log('event listener callback')
       sendEvent(ApikaEvent.APIKA_INIT, config);
     });
-
+    
     prepareConfig(userConfig);
 
     // Create shadow DOM first
@@ -176,13 +173,14 @@ const apika = {
     loadCustomStyles()
       .then(() => loadScript())
       .then(() => {
-        console.log("is loaded yes");
+        console.log('is loaded yes')
         isLoaded = true;
+
       })
       .catch((error) => {
         console.error("Failed to initialize Apika", error);
       });
-  },
+  }
 };
 sendEvent(ApikaEvent.APIKA_INIT_LOADED);
 // @ts-ignore

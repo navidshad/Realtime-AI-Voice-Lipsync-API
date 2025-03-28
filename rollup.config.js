@@ -73,10 +73,16 @@ const commonPlugins = [
     preventAssignment: true,
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     "process.env.NODE_MODE": JSON.stringify(process.env.NODE_MODE),
-    "process.env.OPENAI_API_KEY": JSON.stringify(process.env.OPENAI_API_KEY),
+    "process.env.OPENAI_API_KEY":
+      isDevMode && JSON.stringify(process.env.OPENAI_API_KEY),
     "process.env.GET_SESSION_DATA_URL": JSON.stringify(
       process.env.GET_SESSION_DATA_URL
     ),
+
+    //In dev mode we have both FE and BE, but in build mode we have just 1 instance app url (based on BE)
+    "process.env.APIKA_SERVICE_URL":
+      isDevMode && JSON.stringify(process.env.APIKA_SERVICE_URL),
+    "process.env.APIKA_APP_URL": JSON.stringify(process.env.APIKA_APP_URL),
 
     //In dev mode we have both FE and BE, but in build mode we have just 1 instance app url (based on BE)
     "process.env.APIKA_SERVICE_URL": isDevMode

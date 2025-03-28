@@ -1,246 +1,403 @@
 import { Flow } from "./types";
 import categories from "./categories.json";
-const FlowHimanshu: Flow = (setActiveScene) => [
-  {
-    label: "Step 1: Discover Interests",
-    instructions: `
-            1. FIRST: Call getListOfCategories to fetch the ONLY valid categories.
-            2. THEN: Help the user select SPECIFICALLY from these categories.
+import { Course, CourseDetails } from "../components/shared/types";
+import { lmsBeApi } from "../integrations/lms-be/lms-be-api";
 
-            ⚠️ CRITICAL RULES:
-            - ONLY accept interests that EXACTLY match the categories from getListOfCategories
-            - If user mentions anything not in the list, say: "I don't see that in our available categories.
-              Let me show you what we have..." and then list some relevant options from our actual categories
-            - Never proceed until user has selected a valid category from the list
+const FlowHimanshu: Flow = (setActiveScene) => {
+  let selectedBroadCategory: string | undefined;
+  let selectedCategory: string | undefined;
 
-            Suggested approach:
-            - Start broad: "We offer courses in areas like DevOps, Cloud, Security, and AI. Which interests you?"
-            - If needed, list more specific options from our categories
-            - Always verify the user's interest matches one of our exact categories
-
-            Remember: Do not suggest any specific courses at this stage.
-          `,
-    tools: {
-      clearActiveScene: {
-        definition: {
-          type: "function",
-          name: "clearActiveScene",
-          description:
-            "Clear the active scene, if any scene from previous steps is still active",
-        },
-        handler: async () => {
-          setActiveScene({
-            type: "none",
-            data: undefined,
-          });
-          return { success: true, message: "Active scene cleared" };
-        },
-      },
-      getListOfCategories: {
-        definition: {
-          type: "function",
-          name: "getListOfCategories",
-          description:
-            "Get a list of categories that is supported by the AI. Interests of the user should be one of these categories.",
-        },
-        handler: () => {
-            return {
+  return {
+    globalInstructions: `
+      You are the AI assistant for KodeKloud.
+      You are helping the user to find the best available courses for their interests based on kodekloud's catalog.
+    `,
+    steps: [
+      {
+        label: "Step 1: Greeting, List of Broad Categories",
+        instructions: `
+          This step is two genral parts:
+          1. Greeting the user
+          2. Showing the list of broad categories
+    
+          Part 1: Greeting the user
+          - 👋 Welcome the user with a friendly message.
+          - Let them know you can help them discover and explore technical courses.
+          - Mention that you'll ask about their interests and guide them step-by-step.
+          - Do not ask for any preferences yet—this is just an onboarding moment.
+    
+          Part 2: Showing the list of broad categories
+          - As soon as this step starts, your **very first action** must be to call the "showCategories" tool.
+          - Do not wait for a user message. Do not say anything before calling the tool.
+          - This tool also handles rendering the list on screen — you MUST NOT describe the categories in text.
+          - Accept broad inputs like "DevOps", "Cloud", "AI", etc.
+          - If the user's input is unclear, follow up with a clarifying question.
+          - Once a broad topic is recognized, transition to Step 2 for further refinement.
+    
+          ⚠️ Important:
+          - Do NOT wait for the user to say "show me options" — you must render them proactively by calling the tool.
+          - You MUST NOT list category names manually in any response.
+          - You MUST call "showCategories" FIRST — before any explanation or conversation.
+    
+          Goal:
+          - Greet the user
+          - Show the list of broad categories
+          - Wait for the user to choose a broad interest
+        `,
+        tools: {
+          showCategories: {
+            definition: {
+              type: "function",
+              name: "showCategories",
+              description:
+                "Call this tool to show the list of broad categories to the user",
+            },
+            handler: () => {
+              const broadCategories = Object.keys(categories);
+              setActiveScene({ type: "categories", data: broadCategories });
+              return {
                 success: true,
-                data: categories
-            };
-        },
-      },
-    },
-  },
-  {
-    label: "Step 2: Show Relevant Courses",
-    instructions: `
-              IMPORTANT: Only use the exact category name that was validated in Step 1 using getListOfCategories.
-              DO NOT modify, paraphrase, or alter the category name in any way.
-
-              Based on the user's validated category:
-              1. Call fetchCourses with the EXACT category name
-              2. Wait for the UI to display the course cards
-              3. Wait for user's selection
-
-              ⚠️ IMPORTANT:
-              - DO NOT list or describe any courses yourself
-              - DO NOT generate markdown, bullet points, or numbered course lists
-              - DO NOT paraphrase or repeat course data
-              - DO NOT use markdown or any formatting
-              - DO NOT modify the category name - use it exactly as validated in Step 1
-
-              ✅ INSTEAD:
-              - Simply call the fetchCourses tool with the exact category name from Step 1
-              - The UI will automatically display the courses as cards
-              - Wait for the user's selection to proceed
-
-              Only respond with follow-up questions or clarifications (if needed), NOT course content.
-              If they want to change their interests, go back to Step 1.
-          `,
-    tools: {
-      fetchCourses: {
-        definition: {
-          type: "function",
-          name: "fetchCourses",
-          description: "Fetch a list of courses based on a category.",
-          parameters: {
-            type: "object",
-            properties: {
-              category: {
-                type: "string",
-                description: "category to filter courses",
+                data: broadCategories,
+                messageToAI:
+                  "The list of broad categories has now been rendered. Do NOT list them. You may now ask the user to choose a broad interest from the rendered options.",
+              };
+            },
+          },
+          selectBroadCategory: {
+            definition: {
+              type: "function",
+              name: "selectBroadCategory",
+              description:
+                "Select a broad category from the list of categories",
+              parameters: {
+                type: "object",
+                properties: {
+                  category: {
+                    type: "string",
+                    description: "The selected category",
+                  },
+                },
+                required: ["category"],
               },
             },
-            required: ["category"],
+            handler: ({ category }) => {
+              const broadCategories = Object.keys(categories);
+              if (!broadCategories.includes(category)) {
+                return {
+                  success: false,
+                  messageToAI: `Invalid category: ${category}`,
+                };
+              } else {
+                selectedBroadCategory = category;
+                setActiveScene({ type: "none", data: undefined });
+                return {
+                  success: true,
+                  messageToAI: `Selected broad category: ${category}, now transition to next step`,
+                };
+              }
+            },
           },
         },
-        handler: async ({ category }) => {
-          console.log(`Mock fetchCourses called with topic: ${category}`);
-          const data = [
-            {
-              id: "course-1",
-              title: `Intro to ${category}`,
-              description: `A beginner-friendly introduction to ${category}.`,
-              level: "Beginner",
-            },
-            {
-              id: "course-2",
-              title: `${category} Advanced`,
-              description: `An advanced course diving deep into ${category}.`,
-              level: "Advanced",
-            },
-            {
-              id: "course-3",
-              title: `${category} Hands-On Projects`,
-              description: `Practice ${category} through real-world projects.`,
-              level: "Intermediate",
-            },
-          ];
-          setActiveScene({
-            type: "list",
-            data: data,
-          });
-          return {
-            success: true,
-            data,
-          };
+        exitCondition: () => {
+          if (selectedBroadCategory === undefined) {
+            return false;
+          } else {
+            return true;
+          }
         },
       },
-    },
-  },
-  {
-    label: "Step 3: Course Deep Dive",
-    instructions: `
-            When a user selects a course, fetch its details using the Course Details API.
-            Display course syllabus, duration, difficulty, and any relevant highlights in a visually engaging way.
-            Ask if the user wants to explore more courses or end the session.
-              ⚠️ IMPORTANT:
-              - DO NOT list or describe any course details yourself.
-              - DO NOT generate markdown, bullet points, or numbered items for any course details.
-              - DO NOT paraphrase or repeat course data.
-              - DO NOT use markdown or any formatting.
-              ✅ INSTEAD:
-              - Simply call the fetchCourseDetails tool with the courseId.
-              - The UI will automatically display the course as a card.
-              - Wait for the user's selection to proceed.
+      {
+        label: "Step 2: Refine and Select Category",
+        instructions: (stepIndex) => {
+          const validCategories = categories[
+            selectedBroadCategory as keyof typeof categories
+          ].map((c: any) => c.name);
+          const validCategoriesString = validCategories.join(", ");
 
-              Only respond with follow-up questions or clarifications (if needed), NOT course content.
-              If they want to explore more courses, ask if they still have the same interests.
-                  If yes, then go back to Step 2.
-                  If they want to change their interests, go back to Step 1.
-          `,
-    tools: {
-      fetchCourseDetails: {
-        definition: {
-          type: "function",
-          name: "fetchCourseDetails",
-          description: "Fetch detailed info about a single course by ID.",
-          parameters: {
-            type: "object",
-            properties: {
-              courseId: {
-                type: "string",
-                description: "Unique ID of the course",
+          return `
+            ✅ What to do:
+            - Wait for the user to select one exact category from the list rendered on the screen
+            - If no selection is made, politely ask the user to pick one from the displayed list
+            - If the user selects another broad or vague term that does not EXACTLY match a category from getListOfCategories, repeat this step from the beginning
+    
+            ⚠️ Important:
+            - You MUST NOT list, describe, or enumerate categories manually in your response
+            - You MUST verify the user's selection against the returned list of valid categories
+            - You MUST NOT proceed unless the selected category EXACTLY matches a category name from the list
+            - If the user wants to select a different broad category, return to Step 1
+            - If user's selection is ambiguous or not an exact match, ask them to specifically choose one from the displayed list
+    
+            Goal:
+            - to help user to select a valid category from the list
+
+            Valid categories:
+            ${validCategoriesString}
+        `;
+        },
+        exitCondition: () => {
+          if (selectedCategory === undefined) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        onEnter: () => {
+          const filteredCategories =
+            categories[selectedBroadCategory as keyof typeof categories];
+          setActiveScene({
+            type: "categories",
+            data: filteredCategories.map((c: any) => c.name),
+          });
+        },
+        tools: {
+          // getListOfCategories: {
+          //   definition: {
+          //     type: "function",
+          //     name: "getListOfCategories",
+          //     description:
+          //       "Get the list of valid categories that the user must choose from, filtered by a broad category.",
+          //     parameters: {
+          //       type: "object",
+          //       properties: {
+          //         broadCategory: {
+          //           type: "string",
+          //           description:
+          //             "A broad or general category used to filter the list of valid categories",
+          //         },
+          //       },
+          //       required: ["broadCategory"],
+          //     },
+          //   },
+          //   handler: ({
+          //     broadCategory,
+          //   }: {
+          //     broadCategory: keyof typeof categories;
+          //   }) => {
+          //     // Simple filter logic based on inclusion of the broadCategory string
+          //     const filteredCategories = categories[broadCategory];
+          //     setActiveScene({
+          //       type: "categories",
+          //       data: filteredCategories.map((c) => c.name),
+          //     });
+          //     return {
+          //       success: true,
+          //       data: filteredCategories,
+          //       messageToAI: `Filtered categories based on "${broadCategory}" are on the screen.`,
+          //     };
+          //   },
+          // },
+          selectCategory: {
+            definition: {
+              type: "function",
+              name: "selectCategory",
+              description: "Select a category from the list of categories",
+            },
+            handler: ({ category }) => {
+              const filteredCategories =
+                categories[selectedBroadCategory as keyof typeof categories];
+              const existingCategory = filteredCategories.find(
+                (c) => c.name === category
+              );
+              if (!existingCategory) {
+                return {
+                  success: false,
+                  messageToAI: `Invalid category: ${category}`,
+                };
+              } else {
+                selectedCategory = category;
+                setActiveScene({ type: "none", data: undefined });
+                return {
+                  success: true,
+                };
+              }
+            },
+          },
+        },
+      },
+      {
+        label: "Step 3: Show Relevant Courses",
+        instructions: `
+          :white_check_mark: Use the exact category name validated in Step 1.
+    
+          1. Call fetchCourses with the EXACT category name
+          2. Wait for the UI to display course cards
+          3. Wait for user's selection
+    
+          :warning: STRICT RULES:
+          - DO NOT list, describe, paraphrase or format course data
+          - DO NOT use markdown, bullet points or alter the category name
+    
+          :white_check_mark: INSTEAD:
+          - Simply call fetchCourses tool with the exact category name
+          - UI will render the cards
+          - Wait for user interaction to proceed
+    
+          :repeat: If user wants to change interest, go back to Step 1.
+        `,
+        tools: {
+          fetchCourses: {
+            definition: {
+              type: "function",
+              name: "fetchCourses",
+              description:
+                "Fetch a list of courses based on a category. As input, use always category name with case sensitive letters like 'Cloud'. You can serialize multiple categories like 'Cloud,Azure'.",
+              parameters: {
+                type: "object",
+                properties: {
+                  category: {
+                    type: "string",
+                    description: "Category to filter courses",
+                  },
+                },
+                required: ["category"],
               },
             },
-            required: ["courseId"],
+            handler: async ({ category }) => {
+              const response = await lmsBeApi.getCoursesByCategories([
+                category,
+              ]);
+              console.log(`API CALL: ${category}`, response);
+              const data = response?.courses || [];
+
+              setActiveScene({
+                type: "list",
+                data: data as unknown as Course[],
+              });
+              const aiData = data.map((course) => ({
+                id: course.id,
+                title: course.title,
+                tutors: course.tutors.map((tutor) => tutor.name),
+                difficultyLevel: course.difficulty_level,
+              }));
+              return {
+                success: true,
+                data: aiData,
+                messageToAI: `Courses for ${category} have been fetched and displayed as cards.`,
+              };
+            },
           },
         },
-        handler: async ({ courseId }) => {
-          console.log(
-            `Mock fetchCourseDetails called with courseId: ${courseId}`
-          );
-          const data = {
-            id: courseId,
-            title: "Mock Course Title",
-            description:
-              "This is a detailed description of the selected course.",
-            level: "Intermediate",
-            duration: "6 hours",
-            syllabus: [
-              "Module 1: Introduction",
-              "Module 2: Core Concepts",
-              "Module 3: Hands-On Labs",
-              "Module 4: Final Project",
-            ],
-            highlights: [
-              "100% hands-on",
-              "Certificate of Completion",
-              "Lifetime Access",
-            ],
-          };
-          setActiveScene({
-            type: "details",
-            data: data,
-          });
-          return {
-            success: true,
-            messageToAI: `This is the data. Explain in a natural conversation way only.`,
-            data,
-          };
+      },
+      {
+        label: "Step 4: Course Deep Dive",
+        instructions: `
+          :white_check_mark: When a user selects a course, fetch details using the Course Details API.
+    
+          :warning: RULES:
+          - DO NOT describe or paraphrase the course
+          - DO NOT use formatting or generate bullet points
+    
+          :white_check_mark: INSTEAD:
+          - Call fetchCourseDetails with the selected courseId
+          - UI will show the content
+          - Wait for user's response on what to do next
+    
+          :repeat: If they want more courses, check if the interest is same, if yes go back to Step 3
+          :repeat: If they want new topics or interests or categories go back to Step 1
+        `,
+        tools: {
+          fetchCourseDetails: {
+            definition: {
+              type: "function",
+              name: "fetchCourseDetails",
+              description: "Fetch detailed info about a single course by ID.",
+              parameters: {
+                type: "object",
+                properties: {
+                  courseId: {
+                    type: "string",
+                    description: "Unique ID of the course",
+                  },
+                },
+                required: ["courseId"],
+              },
+            },
+            handler: async ({ courseId }) => {
+              const response = await lmsBeApi.getCourse(courseId);
+              console.log(`API CALL course id: ${courseId}`, response);
+
+              // Convert minutes to hours and format duration string
+              //@ts-ignore
+              const durationInMinutes =
+                // @ts-ignore
+                response?.includesSection?.courseDuration || 0;
+              const hours = Math.floor(durationInMinutes / 60);
+              const minutes = durationInMinutes % 60;
+              const formattedDuration =
+                hours > 0
+                  ? minutes > 0
+                    ? `${hours} hour${hours > 1 ? "s" : ""} ${minutes} min`
+                    : `${hours} hour${hours > 1 ? "s" : ""}`
+                  : `${minutes} min`;
+
+              const data: CourseDetails = {
+                id: courseId,
+                title: response?.title || "Course Title",
+                description:
+                  response?.description || "No description available",
+                duration: formattedDuration,
+                //@ts-ignore
+                difficultyLevel: response?.difficultyLevel || "Intermediate",
+                tutors: response?.tutors?.map((tutor) => tutor.name) || [],
+                plan: response?.plan || "Free",
+                //@ts-ignore
+                thumbnailUrl: response?.thumbnailUrl,
+              };
+              setActiveScene({ type: "details", data });
+              return {
+                success: true,
+                messageToAI: `This is the data. Explain in a natural conversation way only.`,
+                data,
+              };
+            },
+          },
         },
       },
-    },
-  },
-  {
-    label: "Step 4: Wrap Up",
-    instructions: `
-            If the user has found a course or doesn't want to continue, end the conversation positively.
-            Remind them they can always come back to explore more.
-            Say goodbye.
-            If they want to explore more courses, ask if they still have the same interests. If yes, then go back to Step 2.
-            If they want to change their interests, go back to Step 1.
-          `,
-    tools: {
-      clearActiveScene: {
-        definition: {
-          type: "function",
-          name: "clearActiveScene",
-          description:
-            "Clear the active scene, if any scene from previous steps is still active",
-        },
-        handler: async () => {
-          setActiveScene({
-            type: "none",
-            data: undefined,
-          });
-          return { success: true, message: "Active scene cleared" };
+      {
+        label: "Step 5: Wrap Up",
+        instructions: `
+          :white_check_mark: Wrap up the conversation politely.
+    
+          - If user found a course or wants to leave → say goodbye and offer to return anytime
+          - If they want more → ask if same interest → Step 3 or new one → Step 1
+        `,
+        tools: {
+          clearActiveScene: {
+            definition: {
+              type: "function",
+              name: "clearActiveScene",
+              description:
+                "Clear the active scene, if any scene from previous steps is still active",
+            },
+            handler: async () => {
+              setActiveScene({ type: "none", data: undefined });
+              return {
+                success: true,
+                message: "Active scene cleared",
+                messageToAI: "The active scene has been reset for a clean end.",
+              };
+            },
+          },
+          finishConversation: {
+            definition: {
+              type: "function",
+              name: "finishConversation",
+              description: "Finish the conversation and say goodbye",
+            },
+            handler: async () => {
+              alert("Conversation finished");
+              return {
+                success: true,
+                message: "Conversation finished",
+                messageToAI:
+                  "The user has completed their session. Say goodbye warmly.",
+              };
+            },
+          },
         },
       },
-      finishConversation: {
-        definition: {
-          type: "function",
-          name: "finishConversation",
-          description: "Finish the conversation and say goodbye",
-        },
-        handler: async () => {
-          alert("Conversation finished");
-          return { success: true, message: "Conversation finished" };
-        },
-      },
-    },
-  },
-];
+    ],
+  };
+};
 
 export default FlowHimanshu;
