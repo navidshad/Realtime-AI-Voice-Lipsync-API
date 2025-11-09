@@ -1,77 +1,101 @@
-# APIKA - AI assistant
+# AI-Powered Interactive KodeKloud Assistant (APIKA)
 
-APIKA is an AI assistant that helps users on their journey in learning courses. 
-It uses OpenAI API to generate content and provides a user-friendly interface.
+APIKA is an interactive conversational AI assistant designed to streamline the course discovery process for KodeKloud applications. This assistant provides real-time, voice- and text-based consultations to guide users toward the most relevant DevOps courses and learning paths through a dynamic and personalized interface.
 
-## Getting started
+## Features
 
-Install all dependencies with
+- **Voice-First Interaction**: Primary focus on voice input/output with text as a secondary option
+- **AI-Powered Recommendations**: Personalized course suggestions based on user goals and experience
+- **Interactive UI**: Animated agent with dynamic content display
+- **Hybrid Chat Experience**: Seamless switching between voice and text input
+- **Session Persistence**: Maintains conversation history for continuity
 
-```shell
-# Install FE dependencies
-yarn install
+## Tech Stack
 
-# Install BE dependencies
-yarn be:install
+- **Frontend**: React 19, TypeScript, TailwindCSS
+- **Backend**: Express.js
+- **AI**: OpenAI GPT-4o-mini with realtime voice API
+- **Animation**: WebGL/WebRTC for fluid character animations
 
-```
+## Getting Started
 
-Run the local development server with
-```shell
-# DEV: Run the app in development mode - runs both FE and BE
+### Prerequisites
+
+- Node.js (>=18.0.0)
+- Yarn package manager
+- FFmpeg (for audio processing)
+- OpenAI API key
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/apika-ai-assistant.git
+   cd apika-ai-assistant
+   ```
+
+2. Install dependencies:
+   ```bash
+   yarn install
+   yarn be:install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env-template .env
+   ```
+   Then edit `.env` to add your OpenAI API key.
+
+### Development
+
+Run the development server:
+```bash
 yarn dev
-
-# Alternatively, you can run FE and BE separately
-# DEV: Run only the FE in development mode
-yarn fe
-
-# DEV: Run only the BE in development mode
-yarn be
-
 ```
 
-Run tests with
-```shell
-yarn test
+This will start both the frontend and backend servers concurrently:
+- Frontend: [http://localhost:10001](http://localhost:10001)
+- Backend: [http://localhost:8080](http://localhost:8080)
+
+### Production Build
+
+Build for production:
+```bash
+yarn prod
 ```
 
-Run TypeScript check with
-```shell
-yarn tsc
+Start production server:
+```bash
+yarn serve
 ```
 
-```shell
-yarn build
-```
+### Docker Deployment
 
-## Running app within Docker containers
-
-```shell
-
-# DEV: Build the Docker Development image (2 images FE + BE)
+```bash
+# Development mode
 yarn docker:local:build
-
-# DEV: Run the Docker Development image
 yarn docker:local:up
 
-# PROD: Build the Docker Production image (BE only - serving also bundle dist/public files)
+# Production mode
 yarn docker:prod:build
-
-# PROD: Run the Docker Production image
 yarn docker:prod:up
-
-# Stop/remove all running containers
-yarn docker:down
-
 ```
 
-## GCP Deployment
+## Documentation
 
-We have 2 instances running on GCP: 
-- DEV: apika-ai-assistant-dev
-TBD
-- MAIN: apika-ai-assistant-main
-https://apika-ai-assistant-main-3416612702.us-central1.run.app
+Full documentation is available in the `/docs` directory:
 
-```shell
+- [Features Specification](/docs/features/README.md)
+- [System Architecture](/docs/architecture/README.md)
+- [API Design](/docs/api/README.md)
+- [Frontend Architecture](/docs/frontend/README.md)
+- [Development Guidelines](/docs/development/README.md)
 
+## License
+
+This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+## Acknowledgments
+
+- KodeKloud Learning Platform
+- OpenAI for voice and AI capabilities 

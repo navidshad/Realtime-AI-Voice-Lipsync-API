@@ -4,13 +4,15 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import cors from "cors";
 import fs from "fs";
-import fetch from "node-fetch";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+import lipsyncRouter from "./lipsinc.js";
+import fetch from "node-fetch";
 
 const app = express();
 //console.log('Environment:', process.env)
@@ -72,6 +74,7 @@ apiRouter.get("/get-token", async (req, res) => {
 
 // Mount the API router with /api prefix
 app.use("/api", apiRouter);
+app.use("/lipsinc", lipsyncRouter);
 
 // Debug route to check file system
 app.get("/debug", (req, res) => {
