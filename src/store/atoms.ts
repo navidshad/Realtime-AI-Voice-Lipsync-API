@@ -1,6 +1,5 @@
 import { atom } from "jotai";
 import { ConversationDialog, TokenUsage, LiveSession } from "../ai-logic/types";
-import { flows } from "../flows";
 import {Config, defaultConfig} from "../constants";
 
 export const configurationAtom = atom({
@@ -56,6 +55,3 @@ export const getConversationDialogsAtom = atom((get) =>
   get(conversationDialogsAtom)
 );
 export const getMicrophoneMutedAtom = atom((get) => get(isMicrophoneMutedAtom));
-
-// Flow selection atom
-export const selectedFlowAtom = atom<keyof typeof flows>("FlowDemo");
