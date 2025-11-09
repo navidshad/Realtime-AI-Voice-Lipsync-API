@@ -4,16 +4,15 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import cors from "cors";
 import fs from "fs";
-import fileUpload from "express-fileupload";
-
-import lipsyncRouter from "./lipsinc.js";
-import fetch from "node-fetch";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+import lipsyncRouter from "./lipsinc.js";
+import fetch from "node-fetch";
 
 const app = express();
 //console.log('Environment:', process.env)

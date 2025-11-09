@@ -2,12 +2,19 @@ import { Router } from "express";
 import OpenAI from "openai";
 import { promises as fs } from "fs";
 import path from "path";
-import os from "os";
 import { v4 as uuidv4 } from "uuid";
 import { execFile } from "child_process";
 import { promisify } from "util";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
 const execFileAsync = promisify(execFile);
+
+// Load environment variables
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, ".env") });
+console.log("Environment variables:", process.env);
 
 // Initialize OpenAI client
 const openai = new OpenAI({
