@@ -1,4 +1,5 @@
 import { AudioData, AudioDataResponse, TranscriptionResponse } from "./types";
+import { APIKA_SERVICE_URL } from "../constants";
 
 export async function generateOculusLipSyncDataFromServer(options: {
   text?: string;
@@ -6,7 +7,10 @@ export async function generateOculusLipSyncDataFromServer(options: {
 }): Promise<any> {
   console.log("generateOculusLipSyncDataFromServer");
 
-  const url = "http://localhost:8080/lipsinc/generate-from-file";
+  const baseUrl =
+    (globalThis as any)?.serviceBaseUrl ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+  const url = `${baseUrl}/lipsinc/generate-from-file`;
 
   const form = new FormData();
   form.append("audio", options.webmBlob!);
@@ -30,8 +34,11 @@ export async function generateOculusLipSyncDataFromServer(options: {
 export async function generateLipSyncDataFromServer(text: string) {
   console.log("generateLipSyncDataFromServer");
 
+  const baseUrl =
+    (globalThis as any)?.serviceBaseUrl ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   const r = await fetch(
-    `http://localhost:8080/lipsinc/generate?text=${encodeURIComponent(text)}`
+    `${baseUrl}/lipsinc/generate?text=${encodeURIComponent(text)}`
   );
   const data = (await r.json()) as AudioDataResponse;
 

@@ -73,8 +73,9 @@ const commonPlugins = [
     preventAssignment: true,
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     "process.env.NODE_MODE": JSON.stringify(process.env.NODE_MODE),
-    "process.env.OPENAI_API_KEY":
-      isDevMode && JSON.stringify(process.env.OPENAI_API_KEY),
+    "process.env.OPENAI_API_KEY": JSON.stringify(
+      process.env.OPENAI_API_KEY || ""
+    ),
     "process.env.GET_SESSION_DATA_URL": JSON.stringify(
       process.env.GET_SESSION_DATA_URL
     ),

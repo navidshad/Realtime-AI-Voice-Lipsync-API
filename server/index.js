@@ -8,8 +8,21 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, ".env") });
+// Load environment variables:
+// - In Docker, envs come from the container runtime (no file needed)
+// - In local dev, load from server/.env or project root ../.env if present
+(() => {
+  const candidates = [
+    path.join(__dirname, ".env"),
+    path.join(__dirname, "..", ".env"),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      dotenv.config({ path: candidate, override: false });
+      break;
+    }
+  }
+})();
 
 import lipsyncRouter from "./lipsinc.js";
 import fetch from "node-fetch";

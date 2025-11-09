@@ -1,6 +1,7 @@
 import { Router } from "express";
 import OpenAI from "openai";
 import { promises as fs } from "fs";
+import fsSync from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { execFile } from "child_process";
@@ -13,12 +14,25 @@ const execFileAsync = promisify(execFile);
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(__dirname, ".env") });
+(() => {
+  const candidates = [
+    path.join(__dirname, ".env"),
+    path.join(__dirname, "..", ".env"),
+  ];
+  for (const candidate of candidates) {
+    if (fsSync.existsSync(candidate)) {
+      dotenv.config({ path: candidate, override: false });
+      break;
+    }
+  }
+})();
 console.log("Environment variables:", process.env);
+
+console.log("OPENAI_API_KEY For Lipsync:", process.env.OPENAI_API_KEY);
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || "",
 });
 
 // API endpoints
