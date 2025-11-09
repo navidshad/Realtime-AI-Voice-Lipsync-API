@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLiveSessionManager } from "../ai-logic/useLiveSessionManager";
 import { useAtom } from "jotai";
 import { conversationDialogsAtom } from "../store/atoms";
+import TalkingHeadAvatar from "../character/TalkingHeadAvatar";
 
 export const AiRaw: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);

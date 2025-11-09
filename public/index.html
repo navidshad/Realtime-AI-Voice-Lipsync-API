@@ -1,38 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apika - AI Assistant</title>
     <base href="/">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js/+esm",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+                "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.4/modules/talkinghead.mjs"
+            }
+        }
+    </script>
     <style>
         body {
-           background-color: beige;
+            background-color: beige;
         }
     </style>
 </head>
+
 <body>
-<h2>Parent HTML</h2>
-<button
-        onclick="apika.open()"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    Parent Trigger BUTTON
-</button>
+    <h2>Parent HTML</h2>
+    <button onclick="apika.open()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Parent Trigger BUTTON
+    </button>
 
-<!--GTM Script-->
-<script src="init.js"></script>
+    <!--GTM Script-->
+    <script src="init.js"></script>
 
-<!-- consumer app -->
-<script>
-  (function(config) {
-    var i = () => apika.init(config);
-    var l = document.addEventListener;
-    typeof apika !== "undefined" ? i() :
-      l('DOMContentLoaded', () => l('APIKA', i));
-  })({
-    autoShow: false,
-    devMode: true
-  });
-</script>
+    <!-- consumer app -->
+    <script>
+        (function (config) {
+            var i = () => apika.init(config);
+            var l = document.addEventListener;
+            typeof apika !== "undefined" ? i() :
+                l('DOMContentLoaded', () => l('APIKA', i));
+        })({
+            autoShow: false,
+            devMode: true
+        });
+    </script>
 </body>
-</html> 
+
+</html>

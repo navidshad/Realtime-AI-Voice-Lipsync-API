@@ -1,5 +1,5 @@
 import { EphemeralToken } from "./types";
-import {APIKA_SERVICE_URL} from "../constants";
+import { APIKA_SERVICE_URL } from "../constants";
 
 export function isAsync(fn: Function) {
   return fn.constructor.name === "AsyncFunction";
@@ -14,6 +14,7 @@ export async function requestLiveSessionEphemeralToken(additionalSetup: {
     type: string;
     silence_duration_ms: number;
   };
+  modalities: string[];
 }) {
   try {
     const base64Data = window.btoa(JSON.stringify(additionalSetup));

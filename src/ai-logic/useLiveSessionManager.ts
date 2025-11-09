@@ -17,6 +17,7 @@ import {
   AiToolResponse,
   AiToolHandler,
 } from "./types";
+import { CustomMediaRecorder } from "../character/customMediaRecorder";
 
 export function useLiveSessionManager() {
   // State atoms
@@ -37,11 +38,22 @@ export function useLiveSessionManager() {
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const microphoneStreamRef = useRef<MediaStream | null>(null);
   const microphoneTrackRef = useRef<MediaStreamTrack | null>(null);
+
   const onUpdateCallbackRef = useRef<((data: any) => void) | null>(null);
   const onSessionCreatedCallbackRef = useRef<((eventData: any) => void) | null>(
     null
   );
   const sessionToolsRef = useRef<{ [key: string]: any } | null>(null);
+  const sessionModalitiesRef = useRef<string[] | null>(null);
+  const onlyTextRef = useRef<boolean | null>(null);
+
+  // Audio Chunks Capture
+  const durationPart = 2000;
+  const customMediaRecorderRef = useRef<CustomMediaRecorder | null>(null);
+  const onAiSoundStreamedRef = useRef<
+    ((webmBlob: Blob, responseId?: string) => void) | null
+  >(null);
+  const onInterruptionRef = useRef<(() => void) | null>(null);
 
   /*
    * Creating and configuring a live session
@@ -50,24 +62,39 @@ export function useLiveSessionManager() {
   const createLiveSession = async (options: {
     sessionDetails: {
       instructions: string;
-      voice?: string;
       turnDetectionSilenceDuration?: number;
+      voice?: string;
+      onlyText?: boolean;
     };
     tools: AiTools;
     onUpdate?: (data: any) => void;
     onSessionCreated?: () => void;
+    onAiSoundStreamed?: (
+      webmBlob: Blob,
+      responseId?: string
+    ) => void | Promise<void>;
     audioRef: HTMLAudioElement | null;
   }) => {
     console.log("createLiveSession");
 
-    const { sessionDetails, tools, onUpdate, onSessionCreated, audioRef } =
-      options;
+    const {
+      sessionDetails,
+      tools,
+      onUpdate,
+      onSessionCreated,
+      audioRef,
+      onAiSoundStreamed,
+    } = options;
+ 
 
     // Store the tools and callback
     sessionToolsRef.current = tools;
     onUpdateCallbackRef.current = onUpdate || null;
     onSessionCreatedCallbackRef.current = onSessionCreated || null;
     audioElementRef.current = audioRef;
+    sessionModalitiesRef.current = ["text", "audio"];
+    onlyTextRef.current = sessionDetails.onlyText || false;
+    onAiSoundStreamedRef.current = onAiSoundStreamed || null;
 
     try {
       // Create the session
@@ -83,6 +110,7 @@ export function useLiveSessionManager() {
           silence_duration_ms:
             sessionDetails.turnDetectionSilenceDuration || 1000,
         },
+        modalities: sessionModalitiesRef.current,
       });
 
       // Set the live session state
@@ -142,18 +170,32 @@ export function useLiveSessionManager() {
   };
 
   const setupRTP = async () => {
-    if (!audioElementRef.current) {
-      throw new Error("Audio element not provided");
-    }
-
     // Create a peer connection
     peerConnectionRef.current = new RTCPeerConnection();
 
     // Set up to play remote audio from the model
+
+    if (!audioElementRef.current) {
+      throw new Error("Audio element not provided");
+    }
+
     audioElementRef.current.autoplay = true;
     peerConnectionRef.current.ontrack = (e) => {
-      if (audioElementRef.current)
+      if (audioElementRef.current) {
         audioElementRef.current.srcObject = e.streams[0];
+
+        if (!onlyTextRef.current) {
+          audioElementRef.current.volume = 0;
+        }
+
+        customMediaRecorderRef.current = new CustomMediaRecorder(
+          e.streams[0],
+          durationPart,
+          (blob) => {
+            onAiSoundStreamedRef.current?.(blob);
+          }
+        );
+      }
     };
 
     // Add local audio track for microphone input in the browser
@@ -199,12 +241,41 @@ export function useLiveSessionManager() {
         updateTokenUsage(eventData.response.usage);
         updateLiveSessionRecordOnServer();
       }
+    } else if (type === "conversation.item.truncated") {
+      onInterruptionRef.current?.();
     } else if (type === "error") {
       console.error("Error from AI", eventData);
+    }
+
+    // Capture Audio Chunks
+    if (onAiSoundStreamedRef.current) {
+      if (type == "output_audio_buffer.started") {
+        if (onlyTextRef.current == true) {
+          audioElementRef.current!.volume = 0;
+        }
+
+        // find the last dialog
+        const { response_id } = eventData;
+        const lastDialog = conversationDialogs.find(
+          (d) => d.id === response_id
+        );
+
+        customMediaRecorderRef.current!.start(lastDialog?.content);
+      } else if (
+        type == "output_audio_buffer.stopped" ||
+        type == "conversation.item.truncated"
+      ) {
+        customMediaRecorderRef.current!.stop();
+      }
     }
   };
 
   const endLiveSession = () => {
+    if (customMediaRecorderRef.current) {
+      customMediaRecorderRef.current.stop();
+      customMediaRecorderRef.current = null;
+    }
+
     if (peerConnectionRef.current === null) {
       console.warn("No active peer connection to close");
       return { success: false, message: "No active session" };

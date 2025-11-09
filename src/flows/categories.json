@@ -1,43 +1,124 @@
 {
     "Cloud Computing": [
-      { "id": "35747a26-480c-4b3e-a7f0-f0f72205c7f0", "name": "AWS" },
-      { "id": "2fa76814-3cd4-4c39-8fc8-42276f747bca", "name": "Azure" },
-      { "id": "ccda2504-0584-4269-bfcc-4ba236e4284d", "name": "GCP" },
-      { "id": "942c0bfe-4a74-457f-b1a8-a4a64d219505", "name": "Cloud" }
+        {
+            "id": "35747a26-480c-4b3e-a7f0-f0f72205c7f0",
+            "name": "AWS"
+        },
+        {
+            "id": "2fa76814-3cd4-4c39-8fc8-42276f747bca",
+            "name": "Azure"
+        },
+        {
+            "id": "ccda2504-0584-4269-bfcc-4ba236e4284d",
+            "name": "GCP"
+        },
+        {
+            "id": "942c0bfe-4a74-457f-b1a8-a4a64d219505",
+            "name": "Cloud"
+        }
     ],
     "DevOps": [
-      { "id": "cbbbe277-58c8-41f7-a80b-2122d2ff921f", "name": "CI/CD" },
-      { "id": "71026d71-6cc9-4e4e-9422-a5bdb59892bd", "name": "DevOps" },
-      { "id": "35af6f11-26d9-4845-a4d6-770e9fbf373c", "name": "DevSecOps" },
-      { "id": "bce22094-dec0-429a-8036-4c38b54d0ee2", "name": "Automation" },
-      { "id": "4ce0a428-d567-4b9d-978f-734030e99224", "name": "Infrastructure as Code (IaC)" },
-      { "id": "3cc24c10-a08e-4e5f-bc46-93857cb0b5cf", "name": "Container Orchestration" },
-      { "id": "dd9375bd-2232-49ae-9e40-57fc0922d9a9", "name": "Containers" },
-      { "id": "e93501b6-3f3a-4389-9adc-e33df7be5d1c", "name": "HashiCorp" },
-      { "id": "e95e8f5d-aeed-4018-8d63-0458598674b3", "name": "Kubernetes" },
-      { "id": "1ee85142-f420-445b-865d-f5873763c781", "name": "Monitoring" },
-      { "id": "1e210ccf-5efc-494b-b5e0-ddb3376302d3", "name": "Linux" }
+        {
+            "id": "cbbbe277-58c8-41f7-a80b-2122d2ff921f",
+            "name": "CI/CD"
+        },
+        {
+            "id": "71026d71-6cc9-4e4e-9422-a5bdb59892bd",
+            "name": "DevOps"
+        },
+        {
+            "id": "35af6f11-26d9-4845-a4d6-770e9fbf373c",
+            "name": "DevSecOps"
+        },
+        {
+            "id": "bce22094-dec0-429a-8036-4c38b54d0ee2",
+            "name": "Automation"
+        },
+        {
+            "id": "4ce0a428-d567-4b9d-978f-734030e99224",
+            "name": "Infrastructure as Code (IaC)"
+        },
+        {
+            "id": "3cc24c10-a08e-4e5f-bc46-93857cb0b5cf",
+            "name": "Container Orchestration"
+        },
+        {
+            "id": "dd9375bd-2232-49ae-9e40-57fc0922d9a9",
+            "name": "Containers"
+        },
+        {
+            "id": "e93501b6-3f3a-4389-9adc-e33df7be5d1c",
+            "name": "HashiCorp"
+        },
+        {
+            "id": "e95e8f5d-aeed-4018-8d63-0458598674b3",
+            "name": "Kubernetes"
+        },
+        {
+            "id": "1ee85142-f420-445b-865d-f5873763c781",
+            "name": "Monitoring"
+        },
+        {
+            "id": "1e210ccf-5efc-494b-b5e0-ddb3376302d3",
+            "name": "Linux"
+        }
     ],
     "Artificial Intelligence (AI)": [
-      { "id": "0a17dd88-565d-4aa6-818e-f0a45675b23f", "name": "AI" },
-      { "id": "bc74ad7c-6de2-4b35-b726-7b07691cd048", "name": "Python" },
-      { "id": "54c3f404-f48b-4ed9-a034-f88511f4934c", "name": "Programming" }
+        {
+            "id": "0a17dd88-565d-4aa6-818e-f0a45675b23f",
+            "name": "AI"
+        },
+        {
+            "id": "bc74ad7c-6de2-4b35-b726-7b07691cd048",
+            "name": "Python"
+        },
+        {
+            "id": "54c3f404-f48b-4ed9-a034-f88511f4934c",
+            "name": "Programming"
+        }
     ],
     "Cybersecurity": [
-      { "id": "643639d6-fc07-4e1b-a07c-06b5217b95f1", "name": "Security" },
-      { "id": "35af6f11-26d9-4845-a4d6-770e9fbf373c", "name": "DevSecOps" },
-      { "id": "1da5e601-d465-4df9-ac18-bb02410e2de4", "name": "Red Hat" }
+        {
+            "id": "643639d6-fc07-4e1b-a07c-06b5217b95f1",
+            "name": "Security"
+        },
+        {
+            "id": "35af6f11-26d9-4845-a4d6-770e9fbf373c",
+            "name": "DevSecOps"
+        },
+        {
+            "id": "1da5e601-d465-4df9-ac18-bb02410e2de4",
+            "name": "Red Hat"
+        }
     ],
     "Data Science": [
-      { "id": "bc74ad7c-6de2-4b35-b726-7b07691cd048", "name": "Python" },
-      { "id": "54c3f404-f48b-4ed9-a034-f88511f4934c", "name": "Programming" }
+        {
+            "id": "bc74ad7c-6de2-4b35-b726-7b07691cd048",
+            "name": "Python"
+        },
+        {
+            "id": "54c3f404-f48b-4ed9-a034-f88511f4934c",
+            "name": "Programming"
+        }
     ],
     "Certifications & Challenges": [
-      { "id": "bc252a26-f0d0-4a12-8b37-d7d53f83d9fd", "name": "Certification" },
-      { "id": "8c0656a3-5ef6-4b25-a54a-a2408732a411", "name": "Challenges" },
-      { "id": "ab185f4d-fa46-4f0f-8e4c-28bb5d75daf9", "name": "Bonus Courses" }
+        {
+            "id": "bc252a26-f0d0-4a12-8b37-d7d53f83d9fd",
+            "name": "Certification"
+        },
+        {
+            "id": "8c0656a3-5ef6-4b25-a54a-a2408732a411",
+            "name": "Challenges"
+        },
+        {
+            "id": "ab185f4d-fa46-4f0f-8e4c-28bb5d75daf9",
+            "name": "Bonus Courses"
+        }
     ],
     "Productivity / Meta-Skills": [
-      { "id": "918c17c4-8062-48b7-9810-75fe9a3c42de", "name": "Productivity" }
+        {
+            "id": "918c17c4-8062-48b7-9810-75fe9a3c42de",
+            "name": "Productivity"
+        }
     ]
-  }
+}

@@ -13,6 +13,7 @@ import { selectedFlowAtom, configurationAtom } from "./store/atoms";
 import { flows } from "./flows";
 import {useApikaInitializer} from "./hooks/useApikaInitializer";
 import {MainButton} from "./components/shared/MainButton";
+import {AiCharacter} from "./pages/AiCharacter";
 
 // FlowSelector component
 const FlowSelector: React.FC = () => {
@@ -49,6 +50,7 @@ export function App() {
             <Route path="/ai-raw" element={<AiRaw />} />
             <Route path="/ai-assistant" element={<AiAssistant />} />
             <Route path="/ai-flow" element={<AiFlow />} />
+            <Route path="/ai-character" element={<AiCharacter />} />
             <Route
               path="/"
               element={
@@ -73,6 +75,12 @@ export function App() {
                               className=" hover:text-gray-700"
                             >
                               AI Assistant
+                            </Link>
+                            <Link
+                              to="/ai-character"
+                              className=" hover:text-gray-700"
+                            >
+                              AI Character
                             </Link>
                           </div>
                           <div className="flex justify-center mt-4">
